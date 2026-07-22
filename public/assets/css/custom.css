@@ -1,0 +1,456 @@
+body {
+	
+}
+
+
+/* customized from group */
+
+@-moz-document url-prefix(){
+    span.taka{
+        font-weight: 900 !important;
+        margin-right: 3px;
+        font-size: 22px !important;
+    }
+}
+
+/* Chrome only: */
+@media screen and (-webkit-min-device-pixel-ratio:0) { 
+    span.taka{
+        font-weight: 800 !important;
+        margin-right: 3px;
+        font-size: 16px !important;
+    }
+}
+
+/* span.taka{
+    font-weight: 800 !important;
+    margin-right: 3px;
+    font-size: 22px !important;
+} */
+
+
+span.tk{
+    font-weight: 500;
+    margin-left: 3px;
+}
+ 
+input.form-control:read-only {
+    background-color: #f3f3f3 !important;
+    cursor:  not-allowed !important;
+}
+
+input.form-control:focus {
+    background-color: #f3f3f3 !important;
+    outline: none !important;
+    border:1px solid #f3f3f3 !important;
+}
+
+.form-group .control-label, .form-group > label {
+    font-weight: 700;
+    color: #34395e;
+    font-size: 14px;
+}
+
+.form-group{
+    margin-bottom:10px !important;
+}
+.form-group label{
+    margin-bottom:0 !important;
+}
+.input-group-text,
+select.form-control:not([size]):not([multiple]),
+.form-control {
+    font-size: 13px !important;
+    padding: 5px 15px !important;
+    height: 35px !important;
+}
+
+.btn{
+    line-height: 22px !important;
+}
+
+/* hide dropdown icon Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* hide input number field icon  Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* selectric select option */
+.selectric{
+    min-height: 35px !important;
+    padding-left: 0 !important;
+}
+.selectric .label {
+    line-height: 35px !important;
+    height: 33px !important;
+}
+
+/* input search box */
+.search-box{
+    z-index:4000 !important;
+    position:absolute; 
+    width:93%;
+    overflow:auto;
+    height:auto;
+    max-height:220px;
+}
+
+.navbar-search-box{
+    z-index: 4000 !important;
+    top: 40px;
+    position: absolute;
+    width: 27%;
+    overflow: hidden;
+    max-height: 320px;
+}
+
+table{
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+}
+
+table #total_count{
+    font-weight: bold;
+}
+/* .table:not(.table-sm):not(.table-md):not(.dataTable) td,
+.table:not(.table-sm):not(.table-md):not(.dataTable) th{
+    padding: 0 5px !important;
+} */
+.modal-header, .modal-body, .modal-footer{
+    padding: 15px !important;
+}
+
+/* .table:not(.table-sm) thead th {
+    padding-top: 10px !important;
+    padding-bottom: 0 !important;
+}
+
+table.dataTable thead .sorting::before,
+table.dataTable thead .sorting::after,
+table.dataTable thead .sorting_asc::before,
+table.dataTable thead .sorting_asc::after, 
+table.dataTable thead .sorting_desc::before, 
+table.dataTable thead .sorting_desc::after, 
+table.dataTable thead .sorting_asc_disabled::before, 
+table.dataTable thead .sorting_asc_disabled::after, 
+table.dataTable thead .sorting_desc_disabled::before, 
+table.dataTable thead .sorting_desc_disabled::after {
+    bottom: 0rem !important;
+} */
+
+
+a{
+    text-decoration: none !important;
+}
+.alert{
+    padding : 10px 15px !important;
+}
+.alert-danger p{
+    color: #fff !important;
+}
+/* input, .select2, .selectric{
+    border-radius: 30px !important;
+} */
+select + .select2-container {
+    width: 100% !important;
+    /* border-radius: 30px !important; */
+}
+
+
+select { 
+/* for Firefox */ 
+-moz-appearance: none; 
+/* for Safari, Chrome, Opera */ 
+-webkit-appearance: none; 
+} 
+
+/* for IE10 */ 
+select::-ms-expand { 
+display: none;
+}
+
+/* .select2-container.select2-container .select2-selection--single{
+    border-radius: 30px !important;
+} */
+.raised-1:hover {
+    box-shadow: 0 7px 14px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+.bootstrap-timepicker-widget table td input{
+    width: 30px !important;
+}
+.bootstrap-timepicker-widget a.btn, .bootstrap-timepicker-widget input{
+    border-radius: 0 !important;
+}
+
+/*==================== Start Sidebar CSS ====================*/
+.main-sidebar .sidebar-menu li.menu-header{
+    padding:7px 15px !important ;
+}
+.main-sidebar .sidebar-menu li a{
+    height: 35px !important ;
+}
+ul.dropdown-menu li.active a.nav-link{
+    color: #4F5ECE !important;
+}
+
+ul.dropdown-menu li.active{
+    color: #4F5ECE !important;
+}
+
+ul.sidebar-menu li.dropdown a{
+    outline: 0 !important;
+}
+
+ul.sidebar-menu li.dropdown{
+    margin-top: 7px !important;
+}
+
+.main-sidebar .sidebar-menu li ul.dropdown-menu li a{
+    font-size: 14px;
+}
+
+.main-sidebar .sidebar-menu li.menu-header{
+    margin:0 !important;
+}
+
+.navbar{
+    height: 50px !important;
+    line-height: 50px !important;
+}
+
+/* .navbar .form-inline .form-control{
+    min-height: 25px !important;
+} */
+
+.main-sidebar .sidebar-brand{
+    position: sticky;
+    top: 0;
+    z-index:1;
+    overflow:hidden;
+    background:#ffffff;
+    box-shadow: 0 0 10px 1px rgba(68,102,242,0.05);
+    height: 50px !important;
+    line-height: 50px !important;
+}
+/* 
+.search-element form {
+    margin-top: 10px !important;
+	position: relative !important;
+    width: 230px !important;
+} */
+
+.main-sidebar .sidebar-menu li.active ul.dropdown-menu{
+    background-color: transparent !important;
+}
+
+/*==================== End Sidebar CSS ====================*/
+
+/*==================== Main Content CSS Start ====================*/
+.main-content{
+    padding-top:65px !important;
+}
+
+/*==================== Main Content CSS End ====================*/
+
+/*==================== Start Modal CSS ====================*/
+.modal-backdrop.navbar {
+    z-index: -1;
+}
+
+.modal-title{
+    font-size: 15px !important;
+    margin: 0 auto !important;
+    display: block !important;
+    color: #000000;
+}
+
+.modal-content {
+    border: 10px solid #ecf0f1
+}
+
+.modal-header button.close:hover{
+    background-color: #ecf0f1;
+    opacity: 1 !important;
+}
+.modal-header button.close{
+    position: absolute;
+    background-color:#ecf0f1;
+    opacity: 1 !important;
+    right: 0;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    outline: 0 !important;
+}
+
+.modal-header button span{
+    position: relative;
+    color: #d9534f;
+    right: 6px;
+    top: -12px;
+}
+
+.card .card-header .card-title{
+    margin-bottom: 0 !important;
+}
+
+.card-header-action a{
+    color: #ffffff !important;
+    font-weight: bold  !important;
+}
+
+.card-header-action a :hover{
+    color: #ffffff !important;
+}
+
+.modal-header{
+    padding: 7px !important;
+    /* background-color: #3498db !important; */
+    /* background: linear-gradient(90deg, rgba(0,210,255,1) 32%, rgba(58,123,213,1) 100%); */
+}
+
+/* .modal-footer{
+    padding: 10px 30px !important;
+}
+   */
+/*==================== End Modal CSS ====================*/
+
+
+/*==================== Start Custom Table CSS ====================*/
+
+.rTable {
+    display: table;
+    width: 100%;
+}
+.rTableRow {
+    display: table-row;
+}
+.rTableHeading {
+    display: table-header-group;
+    background-color: #ddd;
+}
+.rTableCell, .rTableHead {
+    display: table-cell;
+    padding: 8px;
+    border: 1px solid #999999;
+}
+.rTableHeading {
+    display: table-header-group;
+    background-color: #ddd;
+    font-weight: bold;
+}
+.rTableFoot {
+    display: table-footer-group;
+    font-weight: bold;
+    background-color: #ddd;
+}
+.rTableBody {
+    display: table-row-group;
+}
+
+#noExport .dt-buttons button{
+    display: none !important;
+}
+.dataTables_paginate  a.page-link{
+    border-radius: 30px !important;
+    padding: 3px 15px;
+}
+
+div.dataTables_wrapper div.dataTables_filter input{
+    height: 30px !important;
+}
+
+table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > td:first-child::before,
+table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > th:first-child::before{
+    top:16px !important;
+    left:15px !important;
+}
+
+/*==================== End Custom Table CSS ====================*/
+
+/*==================== Start Appointment Radio CSS ====================*/
+
+.radio-toolbar input[type="radio"] {
+    opacity: 0;
+    position: fixed;
+    width: 0;
+}
+
+.radio-toolbar label {
+    display: inline-block;
+    background-color: #fff;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #444;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    /* color:#fff;
+    background-color:#e91e63;
+    border-color:#e91e63;
+    box-shadow: 0 2px 2px 0 rgba(233, 30, 99, .14), 0 3px 1px -2px rgba(233, 30, 99, .2), 0 1px 5px 0 rgba(233, 30, 99, .12); */
+}
+
+.radio-toolbar label:hover {
+    box-shadow: 0 14px 26px -12px rgba(233, 30, 99, .42), 0 4px 23px 0 rgba(0, 0, 0, .12), 0 8px 10px -5px
+    rgba(233, 30, 99, .2);
+    cursor: pointer;
+}
+
+.radio-toolbar input[type="radio"]:focus + label {
+    border: 1px solid #444;
+}
+
+.radio-toolbar input[type="radio"]:checked + label {
+    background-color: #DC2265;
+    border-color: #DC2265;
+    color: #fff;
+}
+
+.radio-toolbar input[type="radio"]:disabled + label {
+    color:#fff;
+    background-color:#F44336;
+    border-color:#F44336;
+}
+
+
+/*==================== Start Appointment Radio CSS ====================*/
+.main-footer{
+    bottom: 0 !important;
+    /* padding: 20px 30px 15px 290px; */
+    /* margin-top: 0; */
+    /* background: linear-gradient(90deg, rgba(51,51,196,1) 18%, rgba(30,191,223,1) 100%); */
+}
+
+
+
+@media (min-width: 768px){
+    a.header-button{
+        margin-bottom: -90px !important;
+        padding: 1px 7px;
+        border-radius: 30px !important;
+    }
+
+    #cardTable{
+        margin-top:-45px !important;
+    }
+}
+@media (max-width: 767px){
+
+    a.header-button{
+        margin: 0 auto !important;
+        display: block !important;
+        max-width: 150px;
+        padding: 1px 7px;
+        border-radius: 30px !important;
+    }
+  
+}

@@ -1,0 +1,41 @@
+version: '3.3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: goldcrm
+    volumes:
+      - .:/var/www/html
+      - /var/www/assets/goldcrm/uplaods:/var/www/html/public/uploads
+    environment:
+      SERVICE_PORT: 9000
+    expose:
+      - 9000
+    networks:
+      - app-network
+      - redis-network
+      - mysql-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: goldcrm_nginx
+    volumes:
+      - .:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./certs:/etc/letsencrypt/live/bs.shadhinportal.com:ro
+    expose:
+      - 8001
+    ports:
+      - 8001:8001
+    networks:
+      - app-network
+
+networks:
+  redis-network:
+    external: true
+  app-network:
+    driver: bridge
+  mysql-network:
+    external: true
