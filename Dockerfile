@@ -18,6 +18,6 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 
 RUN composer install --no-interaction --optimize-autoloader --prefer-dist
 
-EXPOSE 9000
+EXPOSE 9050
 
 CMD ["php-fpm"]
