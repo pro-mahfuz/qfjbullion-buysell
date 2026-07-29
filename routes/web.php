@@ -44,37 +44,37 @@ Route::get('/auto-logout', function () {
 // Route::post('login', [ClientLoginController::class, 'login'])->name('client.login.save');
 // Route::get('register', [RegistrationController::class, 'showRegisterForm'])->name('client.register');
 
-Route::get('privacypolicy', [RegistrationController::class, 'privacypolicy'])->name('privacypolicy');
-Route::get('termsandconditions', [RegistrationController::class, 'termsandconditions'])->name('termsandconditions');
-Route::get('accountdelation', [RegistrationController::class, 'accountdelation'])->name('accountdelation');
+// Route::get('privacypolicy', [RegistrationController::class, 'privacypolicy'])->name('privacypolicy');
+// Route::get('termsandconditions', [RegistrationController::class, 'termsandconditions'])->name('termsandconditions');
+// Route::get('accountdelation', [RegistrationController::class, 'accountdelation'])->name('accountdelation');
 // Route::post(uri: 'register/businessID={}', [RegistrationController::class, 'register'])->name('client.register.save');
 
 
 Route::post('register', [RegistrationController::class, 'register'])->name('client.register.save');
 
 
-Route::middleware(['auth:client', ClientPFCheker::class])->prefix('client')->name('client.')->group(function () {
-    Route::get('/', [ClientDashboardController::class, 'dashboard'])->name('dashboard')->withoutMiddleware(ClientPFCheker::class);
-    Route::post('/logout', [ClientLoginController::class, 'logout'])->name('logout')->withoutMiddleware(ClientPFCheker::class);
-    Route::get('/profile', [ClientDashboardController::class, 'profile'])->name('profile')->withoutMiddleware(ClientPFCheker::class);
-    Route::post('/save-profile', [ClientDashboardController::class, 'profileUpdate'])->name('profile.save')->withoutMiddleware(ClientPFCheker::class);
+// Route::middleware(['auth:client', ClientPFCheker::class])->prefix('client')->name('client.')->group(function () {
+//     Route::get('/', [ClientDashboardController::class, 'dashboard'])->name('dashboard')->withoutMiddleware(ClientPFCheker::class);
+//     Route::post('/logout', [ClientLoginController::class, 'logout'])->name('logout')->withoutMiddleware(ClientPFCheker::class);
+//     Route::get('/profile', [ClientDashboardController::class, 'profile'])->name('profile')->withoutMiddleware(ClientPFCheker::class);
+//     Route::post('/save-profile', [ClientDashboardController::class, 'profileUpdate'])->name('profile.save')->withoutMiddleware(ClientPFCheker::class);
 
-    Route::prefix('deposit')->name('deposit.')->group(function () {
-        Route::get('/', [ClientTransactionController::class, 'getDeposit'])->name('list');
-        Route::get('/create', [ClientTransactionController::class, 'createDeposit'])->name('create');
-        Route::post('/store', [ClientTransactionController::class, 'storeDeposit'])->name('store');
-    });
+//     Route::prefix('deposit')->name('deposit.')->group(function () {
+//         Route::get('/', [ClientTransactionController::class, 'getDeposit'])->name('list');
+//         Route::get('/create', [ClientTransactionController::class, 'createDeposit'])->name('create');
+//         Route::post('/store', [ClientTransactionController::class, 'storeDeposit'])->name('store');
+//     });
 
-    Route::get('/completed-transactions', [ClientTransactionController::class, 'getAllCompletedTransactions'])->name('completed.transactions');
-    Route::get('/buy-sell', [ClientTransactionController::class, 'buySell'])->name('buysell');
-    Route::post('/transaction-save', [ClientTransactionController::class, 'saveTransaction'])->name('transaction.save');
-    Route::post('save-bid', [ClientTransactionController::class, 'saveBid'])->name('save.bid');
-    Route::post('buy-sell-store', [ClientTransactionController::class, 'buySellStore'])->name('buysell.store');
-    Route::get('/show-statement', [ClientTransactionController::class, 'showStatement'])->name('show.statement');
+//     Route::get('/completed-transactions', [ClientTransactionController::class, 'getAllCompletedTransactions'])->name('completed.transactions');
+//     Route::get('/buy-sell', [ClientTransactionController::class, 'buySell'])->name('buysell');
+//     Route::post('/transaction-save', [ClientTransactionController::class, 'saveTransaction'])->name('transaction.save');
+//     Route::post('save-bid', [ClientTransactionController::class, 'saveBid'])->name('save.bid');
+//     Route::post('buy-sell-store', [ClientTransactionController::class, 'buySellStore'])->name('buysell.store');
+//     Route::get('/show-statement', [ClientTransactionController::class, 'showStatement'])->name('show.statement');
 
-    //product
-    Route::get('/shop', [ClientProductController::class, 'getShopItems'])->name('shop');
-});
+//     //product
+//     Route::get('/shop', [ClientProductController::class, 'getShopItems'])->name('shop');
+// });
 
 
 Route::middleware('guest')->get('/', function () {
@@ -118,18 +118,18 @@ Route::middleware(['auth:web', 'otpcheckMiddleware'])->prefix('admin')->name('ad
         Route::post('change-password', [UserController::class, 'changePassword'])->name('change.password')->middleware('acl:user_action');
     });
 
-    Route::prefix('project')->name('project.')->group(function () {
-        Route::get('/', [ProjectController::class, 'projectList'])->name('list');
-        // ->middleware('acl:projects');
-        Route::get('/create', [ProjectController::class, 'projectCreate'])->name('create');
-        // ->middleware('acl:projects_add');
-        Route::post('/store', [ProjectController::class, 'storeProject'])->name('store');
-        // ->middleware('acl:projects_add');
-        Route::get('/edit/{id}', [ProjectController::class, 'editProject'])->name('edit');
-        // ->middleware('acl:projects_edit');
-        Route::put('/update/{id}', [ProjectController::class, 'updateProject'])->name('update');
-        // ->middleware('acl:projects_edit');
-    });
+    // Route::prefix('project')->name('project.')->group(function () {
+    //     Route::get('/', [ProjectController::class, 'projectList'])->name('list');
+    //     // ->middleware('acl:projects');
+    //     Route::get('/create', [ProjectController::class, 'projectCreate'])->name('create');
+    //     // ->middleware('acl:projects_add');
+    //     Route::post('/store', [ProjectController::class, 'storeProject'])->name('store');
+    //     // ->middleware('acl:projects_add');
+    //     Route::get('/edit/{id}', [ProjectController::class, 'editProject'])->name('edit');
+    //     // ->middleware('acl:projects_edit');
+    //     Route::put('/update/{id}', [ProjectController::class, 'updateProject'])->name('update');
+    //     // ->middleware('acl:projects_edit');
+    // });
 
 
     Route::prefix('role')->name('role.')->group(function () {
@@ -241,65 +241,65 @@ Route::middleware(['auth:web', 'otpcheckMiddleware'])->prefix('admin')->name('ad
 
 
 
-    Route::prefix('supplier')->name('supplier.')->group(function () {
-        Route::get('/create', [AccountControler::class, 'suplierCreate'])->name('create');
-        Route::post('/store', [AccountControler::class, 'suplierStore'])->name('store');
-        Route::get('update/{id}', [AccountControler::class, 'supplierUpdate'])->name('update');
-        Route::post('edit', [AccountControler::class, 'supplierEdit'])->name('edit');
-        Route::get('list', [AccountControler::class, 'suplierList'])->name('list');
-        Route::get('details/{id}', [AccountControler::class, 'suplierDetails'])->name('details');
-        Route::get('{id}', [AccountControler::class, 'suplierView'])->name('view');
-    });
+    // Route::prefix('supplier')->name('supplier.')->group(function () {
+    //     Route::get('/create', [AccountControler::class, 'suplierCreate'])->name('create');
+    //     Route::post('/store', [AccountControler::class, 'suplierStore'])->name('store');
+    //     Route::get('update/{id}', [AccountControler::class, 'supplierUpdate'])->name('update');
+    //     Route::post('edit', [AccountControler::class, 'supplierEdit'])->name('edit');
+    //     Route::get('list', [AccountControler::class, 'suplierList'])->name('list');
+    //     Route::get('details/{id}', [AccountControler::class, 'suplierDetails'])->name('details');
+    //     Route::get('{id}', [AccountControler::class, 'suplierView'])->name('view');
+    // });
 
 
-    Route::prefix('client')->name('client.')->group(function () {
-        Route::get('details/{id}', [AccountControler::class, 'clientDetails'])->name('details');
-    });
+    // Route::prefix('client')->name('client.')->group(function () {
+    //     Route::get('details/{id}', [AccountControler::class, 'clientDetails'])->name('details');
+    // });
 
 
 
-    Route::prefix('purchase')->name('purchase.')->group(function () {
-        Route::get('list', [AccountControler::class, 'purchaseList'])->name('list');
-        Route::get('create', [AccountControler::class, 'purchaseCreate'])->name('create');
-        Route::post('store', [AccountControler::class, 'purchaseStore'])->name('store');
-        Route::get('edit/{id}', [AccountControler::class, 'purchaseEdit'])->name('edit');
-        Route::post('update', [AccountControler::class, 'purchaseUpdate'])->name('update');
-        Route::post('additem', [AccountControler::class, 'purchaseAddItem'])->name('additem');
-        Route::post('removeitem', [AccountControler::class, 'purchaseRemoveItem'])->name('removeitem');
-    });
+    // Route::prefix('purchase')->name('purchase.')->group(function () {
+    //     Route::get('list', [AccountControler::class, 'purchaseList'])->name('list');
+    //     Route::get('create', [AccountControler::class, 'purchaseCreate'])->name('create');
+    //     Route::post('store', [AccountControler::class, 'purchaseStore'])->name('store');
+    //     Route::get('edit/{id}', [AccountControler::class, 'purchaseEdit'])->name('edit');
+    //     Route::post('update', [AccountControler::class, 'purchaseUpdate'])->name('update');
+    //     Route::post('additem', [AccountControler::class, 'purchaseAddItem'])->name('additem');
+    //     Route::post('removeitem', [AccountControler::class, 'purchaseRemoveItem'])->name('removeitem');
+    // });
 
 
-    Route::post('/listbysupplier', [AccountControler::class, 'viewBySupplier'])->name('listbysupplier');
+    // Route::post('/listbysupplier', [AccountControler::class, 'viewBySupplier'])->name('listbysupplier');
 
-    Route::get('/fixedpurchase-list', [AccountControler::class, 'fixedPurchaseList'])->name('fixedpurchase.list');
-    Route::get('/sale-create', [AccountControler::class, 'sale'])->name('sale');
-    Route::post('/sale-store', [AccountControler::class, 'saleStore'])->name('sale.store');
-    Route::get('sale-edit/{id}', [AccountControler::class, 'saleEdit'])->name('sale.edit');
-    Route::post('sale-update/{id}', [AccountControler::class, 'editStore'])->name('sale.update');
+    // Route::get('/fixedpurchase-list', [AccountControler::class, 'fixedPurchaseList'])->name('fixedpurchase.list');
+    // Route::get('/sale-create', [AccountControler::class, 'sale'])->name('sale');
+    // Route::post('/sale-store', [AccountControler::class, 'saleStore'])->name('sale.store');
+    // Route::get('sale-edit/{id}', [AccountControler::class, 'saleEdit'])->name('sale.edit');
+    // Route::post('sale-update/{id}', [AccountControler::class, 'editStore'])->name('sale.update');
 
 
     Route::delete('/purchase-remove/{id}', [AccountControler::class, 'purchaseRemove'])->name('purchase-remove');
 
 
-    Route::get('/supplier-deposit', [AccountControler::class, 'depositCreate'])->name('supplier.deposit');
-    Route::post('/supplier-deposit-store', [AccountControler::class, 'depositStore'])->name('supplier.deposit.store');
+    // Route::get('/supplier-deposit', [AccountControler::class, 'depositCreate'])->name('supplier.deposit');
+    // Route::post('/supplier-deposit-store', [AccountControler::class, 'depositStore'])->name('supplier.deposit.store');
 
     Route::get('/deposit-edit/{id}', [AccountControler::class, 'depositEdit'])->name('supplier.deposit.edit');
     Route::post('/deposit-update/{id}', [AccountControler::class, 'depositUpdate'])->name('supplier.deposit.update');
 
     Route::get('/depositlist', [AccountControler::class, 'depositlist'])->name('depositlist');
-    Route::post('/depositListbysupplier', [AccountControler::class, 'depositListBySupplier'])->name('depositListbysupplier');
+    // Route::post('/depositListbysupplier', [AccountControler::class, 'depositListBySupplier'])->name('depositListbysupplier');
 
 
-    Route::get('/supplier-withdraw', [AccountControler::class, 'withdrawCreate'])->name('supplier.withdraw');
-    Route::post('/supplier-withdraw-store', [AccountControler::class, 'withdrawStore'])->name('supplier.withdraw.store');
+    // Route::get('/supplier-withdraw', [AccountControler::class, 'withdrawCreate'])->name('supplier.withdraw');
+    // Route::post('/supplier-withdraw-store', [AccountControler::class, 'withdrawStore'])->name('supplier.withdraw.store');
 
     Route::get('/withdraw-edit/{id}', [AccountControler::class, 'withdrawEdit'])->name('supplier.withdraw.edit');
     Route::post('/withdraw-update/{id}', [AccountControler::class, 'withdrawUpdate'])->name('supplier.withdraw.update');
 
 
     Route::get('/withdrawlist', [AccountControler::class, 'withdrawlist'])->name('withdrawlist');
-    Route::post('/withdrawlistbysupplier', [AccountControler::class, 'withdrawBySupplier'])->name('withdrawlistbysupplier');
+    // Route::post('/withdrawlistbysupplier', [AccountControler::class, 'withdrawBySupplier'])->name('withdrawlistbysupplier');
 
     Route::delete('/deposit-remove/{id}', [AccountControler::class, 'depositRemove'])->name('deposit-remove');
 
@@ -315,33 +315,33 @@ Route::middleware(['auth:web', 'otpcheckMiddleware'])->prefix('admin')->name('ad
     });
 
 
-    Route::prefix('product')->name('product.')->group(function () {
-        Route::get('/', [ProductController::class, 'list'])->name('list');
-        Route::get('/create', [ProductController::class, 'create'])->name('create');
-        Route::post('/store', [ProductController::class, 'store'])->name('store');
-        Route::delete('/{id}', [ProductController::class, 'destroy'])->name('delete');
-    });
+    // Route::prefix('product')->name('product.')->group(function () {
+    //     Route::get('/', [ProductController::class, 'list'])->name('list');
+    //     Route::get('/create', [ProductController::class, 'create'])->name('create');
+    //     Route::post('/store', [ProductController::class, 'store'])->name('store');
+    //     Route::delete('/{id}', [ProductController::class, 'destroy'])->name('delete');
+    // });
 
-    Route::prefix('product-shop')->name('product.shop.')->group(function () {
-        Route::get('/', [ProductController::class, 'shopList'])->name('list');
-        Route::get('/create', [ProductController::class, 'shopCreate'])->name('create');
-        Route::post('/store', [ProductController::class, 'shopStore'])->name('store');
-        Route::delete('/{id}', [ProductController::class, 'shopDestroy'])->name('delete');
-        Route::post('/admin/product/shop/update-qty', [ProductController::class, 'updateQty'])->name('updateQty');
-    });
+    // Route::prefix('product-shop')->name('product.shop.')->group(function () {
+    //     Route::get('/', [ProductController::class, 'shopList'])->name('list');
+    //     Route::get('/create', [ProductController::class, 'shopCreate'])->name('create');
+    //     Route::post('/store', [ProductController::class, 'shopStore'])->name('store');
+    //     Route::delete('/{id}', [ProductController::class, 'shopDestroy'])->name('delete');
+    //     Route::post('/admin/product/shop/update-qty', [ProductController::class, 'updateQty'])->name('updateQty');
+    // });
 
 
 
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
         Route::get('/buysell', [BuySellDashboardController::class, 'buySellDashboard'])->name('buysell');
-        Route::get('/supplier', [SupplierDashBoardController::class, 'supplierDashboard'])->name('supplier');
+        // Route::get('/supplier', [SupplierDashBoardController::class, 'supplierDashboard'])->name('supplier');
     });
 
 
-    Route::prefix('gold-rates')->name('gold-rates.')->group(function () {
-        Route::get('/', [GoldPriceController::class, 'getGoldRates'])->name('list');
-        Route::get('/update-view', [GoldPriceController::class, 'goldUpdateView'])->name('update.view');
-        Route::post('/update-store', [GoldPriceController::class, 'updateGoldRates'])->name('update.store');
-    })->middleware('acl:gold_management');
+    // Route::prefix('gold-rates')->name('gold-rates.')->group(function () {
+    //     Route::get('/', [GoldPriceController::class, 'getGoldRates'])->name('list');
+    //     Route::get('/update-view', [GoldPriceController::class, 'goldUpdateView'])->name('update.view');
+    //     Route::post('/update-store', [GoldPriceController::class, 'updateGoldRates'])->name('update.store');
+    // })->middleware('acl:gold_management');
 
 });

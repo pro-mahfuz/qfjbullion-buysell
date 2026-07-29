@@ -18,12 +18,20 @@ class TransactionController extends Controller
 {
 
     use GolbalHelperTrait;
-    public function __construct(private TransactionService $transactionService, private CustomerService $customerService, private GoldService $goldService)
+
+    private $transactionService;
+    private $customerService;
+    private $goldService;
+
+    public function __construct(
+        TransactionService $transactionService,
+        CustomerService $customerService,
+        GoldService $goldService
+    )
     {
         $this->transactionService = $transactionService;
         $this->customerService = $customerService;
         $this->goldService = $goldService;
-
     }
 
     public function saveTransaction(Request $request)
@@ -35,7 +43,6 @@ class TransactionController extends Controller
             $customer_id = $postData['customer_id'];
             $price = $this->goldService->fetchGoldPrice();
             $equity = $this->transactionService->getEquity($customer_id, $price);
-            
 
             // if (strtoupper($postData['transaction_type']) == "withdraw" || strtoupper($postData['transaction_type']) == strtoupper("withdraw")) {
             //     // $totalTransactionAmountRunning = Buysell::where('customer_id', $postData['customer_id'])->where('is_running', 1)->sum('total_amount_aed');
@@ -48,7 +55,7 @@ class TransactionController extends Controller
 
             //     $postData['transaction_amount'] = -($postData['transaction_amount']);
             // }
-            $postData['business_id'] = \Request::session()->get(key: 'bussinessId');
+            $postData['business_id'] = \Request::session()->get('bussinessId');
             $postData['created_by'] = \Auth::user()->full_name;
             //  dd($postData);
             Transaction::create($postData);
@@ -414,8 +421,8 @@ class TransactionController extends Controller
         $type = $request->type;
         $customers = $this->customerService->getCustomers();
         $details = $this->transactionService->getRunningDetails();
-        $buyDetails = $this->transactionService->getRunningDetailByType(is_running: '1', type: 'buy');
-        $sellDetails = $this->transactionService->getRunningDetailByType(is_running: '1', type: 'sell');
+        $buyDetails = $this->transactionService->getRunningDetailByType('1', 'buy');
+        $sellDetails = $this->transactionService->getRunningDetailByType('1', 'sell');
         
         $transactions = $this->transactionService->getBuySellList($type);
         //dd($transactions);
