@@ -21,13 +21,16 @@ use App\Http\Controllers\Client\TransactionController as ClientTransactionContro
 use App\Http\Middleware\ClientPFCheker;
 use App\Http\Middleware\otpcheckMiddleware;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Http;
 
 use App\Http\Controllers\Client\Auth\LoginController as ClientLoginController;
 use App\Http\Controllers\Client\DashboardController as ClientDashboardController;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/rate', function () {
+    $response = Http::get('https://qfjbullion.com/rate');
+    $data = $response->json();
+    return $data;
+});
 
 
 Route::get('/auto-logout', function () {
@@ -80,7 +83,7 @@ Route::middleware('guest')->get('/', function () {
     }
 });
 
-Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::get('admin/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('admin/login', [LoginController::class, 'login'])->name('login.save');
 Route::get('admin/register', [LoginController::class, 'showRegisterForm'])->name('register');
 Route::get('admin/password/reset', [LoginController::class, 'showResetForm'])->name('password.reset');

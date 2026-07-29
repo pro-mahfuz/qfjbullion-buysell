@@ -1,23 +1,81 @@
 FROM php:8.2-fpm
 
-RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev zip git redis && \
-    docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install gd pdo pdo_mysql
+
+# Install system dependencies and PHP extensions
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    unzip \
+    zip \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    libonig-dev \
+    && docker-php-ext-configure gd \
+        --with-freetype \
+        --with-jpeg \
+    && docker-php-ext-install \
+        gd \
+        pdo \
+        pdo_mysql \
+        mbstring \
+        zip \
+        opcache \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 
 WORKDIR /var/www/html
 
+
+# Fix git ownership issue
+RUN git config --global --add safe.directory /var/www/html
+
+
+# Copy composer files first
+COPY composer.json composer.lock ./
+
+
+# Install Laravel dependencies
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --prefer-dist \
+    --optimize-autoloader \
+    --no-scripts
+
+
+# Copy application files
 COPY . .
 
-RUN chown -R www-data:www-data /var/www/html
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Run Laravel package discovery
+RUN composer dump-autoload --optimize
 
 
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && \
-    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 storage bootstrap/cache
 
-RUN composer install --no-interaction --optimize-autoloader --prefer-dist
+RUN chown -R www-data:www-data /var/www/html/storage \
+    /var/www/html/bootstrap/cache && \
+    chmod -R 775 /var/www/html/storage \
+    /var/www/html/bootstrap/cache
 
-EXPOSE 9050
+
+# Laravel environment
+ENV APP_ENV=production
+
+
+# PHP-FPM port
+EXPOSE 9000
+
 
 CMD ["php-fpm"]

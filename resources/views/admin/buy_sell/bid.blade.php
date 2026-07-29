@@ -345,13 +345,13 @@
 
         isFetching = true;
         try {
-            const response = await fetch('https://furqanjewelry.com/api/get-gold-price', {
+            const response = await fetch('https://buysell.qfjbullion.com/rate', {
                 method: 'GET',
-                // headers: {
-                //     'x-access-token': 'goldapi-7q9uy0tkwrfdtlo-io',
-                //     'Content-Type': 'application/json',
-                // },
             });
+
+         
+
+      
 
             if (!response.ok) {
                 fire('Error fetching the gold price');
@@ -359,7 +359,7 @@
 
             let data = await response.json();
             
-            let sellPrice = data.gold_sell_price - 0.53;
+            let sellPrice = data.value - 0.53;
             let sellDiv = document.getElementById('sellrate');
             sellDiv.textContent = `$${sellPrice.toFixed(2)}`;
             

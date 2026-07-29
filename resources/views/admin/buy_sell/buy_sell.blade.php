@@ -410,7 +410,7 @@
         // Async function to fetch gold price and update DOM
         async function getGoldPrice() {
             try {
-                const response = await fetch('https://furqanjewelry.com/api/get-gold-price', {
+                const response = await fetch('https://buysell.qfjbullion.com/rate', {
                     method: 'GET'
                 });
 
@@ -422,7 +422,7 @@
                 let data = await response.json();
                 console.log(data);
 
-                let sellPrice = data.gold_sell_price - 0.53;
+                let sellPrice = data.value - 0.53;
                 document.getElementById('sellrate').textContent = `$${sellPrice.toFixed(2)}`;
                 buyPriceGlobal = parseFloat(sellPrice);
 

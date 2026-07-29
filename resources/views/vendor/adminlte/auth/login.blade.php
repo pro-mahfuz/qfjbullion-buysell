@@ -25,7 +25,7 @@
 
 <div class="login-container">
   <h4 class="mb-3 text-center">Login</h4>
-  <form action="{{ url('admin/login') }}" method="post">
+  <form action="{{ route('login.save') }}" method="post">
       @csrf
     <!-- CSRF Token if using Laravel -->
     <input type="hidden" name="_token" value="{{ csrf_token() }}">

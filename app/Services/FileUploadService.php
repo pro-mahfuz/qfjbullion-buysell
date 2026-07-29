@@ -36,7 +36,7 @@ class FileUploadService
             $files = $request->file(key: $fileName);
             $imageName =  Str::random() . time() . '.' . $files->getClientOriginalExtension();
             $imageUrl = $createdDirectory . $imageName;
-            $uploadPath = public_path('uploads/' . $createdDirectory);
+            $uploadPath = public_path('uploads' . $createdDirectory);
             $files->move($uploadPath, $imageUrl);
 
             if ($isCompressed) {

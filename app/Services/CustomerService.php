@@ -26,11 +26,12 @@ class CustomerService
     {
         
         $marketPrice = 0;
-        $response = Http::get('https://furqanjewelry.com/api/get-gold-price');
+        $response = Http::get('https://qfjbullion.com/rate');
+        //dd($response->json());
         
         if ($response->successful()) {
             $data = $response->json();
-            $marketPrice = isset($data['gold_sell_price']) ? ($data['gold_sell_price'] - 0.53) : 0;
+            $marketPrice = isset($data['value']) ? ($data['value'] - 0.53) : 0;
         }
         
         $customers = Customer::orderBy('id', 'desc')->get()->map(function ($customer) use ($marketPrice) {
