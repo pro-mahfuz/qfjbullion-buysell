@@ -77,11 +77,11 @@ Route::post('register', [RegistrationController::class, 'register'])->name('clie
 // });
 
 
-Route::middleware('guest')->get('/', function () {
-    if (url()->current() !== route('client.dashboard')) {
-        return redirect()->route('client.dashboard');
-    }
-});
+// Route::middleware('guest')->get('/', function () {
+//     if (url()->current() !== route('client.dashboard')) {
+//         return redirect()->route('client.dashboard');
+//     }
+// });
 
 Route::get('admin/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('admin/login', [LoginController::class, 'login'])->name('login.save');
