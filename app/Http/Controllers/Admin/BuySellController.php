@@ -421,6 +421,32 @@ class BuySellController extends Controller
         ]);
     }
 
+    public function depositWithdrawList(Request $request, string $type)
+    {
+        abort_unless(in_array($type, ['deposit', 'withdraw'], true), 404);
+
+        $query = Transaction::query()
+            ->with('customer')
+            ->where('business_id', session('bussinessId'))
+            ->where('transaction_type', $type)
+            ->when($request->filled('customer_id'), fn ($query) => $query->where('customer_id', $request->customer_id))
+            ->when($request->filled('start_date'), fn ($query) => $query->whereDate('created_at', '>=', $request->start_date))
+            ->when($request->filled('end_date'), fn ($query) => $query->whereDate('created_at', '<=', $request->end_date));
+
+        $totalAmount = (clone $query)->sum('transaction_amount');
+        $transactions = $query
+            ->latest()
+            ->paginate(25)
+            ->withQueryString();
+
+        return view('admin.transaction.deposit-withdraw-list', [
+            'type' => $type,
+            'transactions' => $transactions,
+            'customers' => $this->customerService->getCustomers(),
+            'totalAmount' => $totalAmount,
+        ]);
+    }
+
 
     public function getCompletedDepWithList(Request $request)
     {

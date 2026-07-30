@@ -410,16 +410,18 @@
         // Async function to fetch gold price and update DOM
         async function getGoldPrice() {
             try {
-                const response = await fetch('https://buysell.qfjbullion.com/rate', {
+                const response = await fetch("{{ route('rate') }}", {
                     method: 'GET'
                 });
 
                 if (!response.ok) {
-                    console.error('Error fetching the gold price');
-                    return;
+                    throw new Error('Gold rate service returned an error');
                 }
 
                 let data = await response.json();
+                if (!Number.isFinite(Number(data.value))) {
+                    throw new Error('Gold rate service returned an invalid rate');
+                }
                 console.log(data);
 
                 let sellPrice = data.value - 0.53;

@@ -22,31 +22,27 @@ class BuySellDashboardController extends Controller
             return redirect()->route('admin.dashboard')->with('error', 'Please select a business first.');
         }
 
-        // customer data
-        $totalCustomers = Customer::count();
-        $activeCusomer = Customer::where('status', '=', 'activated')->count();
-        $deactiveCusomer = Customer::where('status', '=', 'deactived')->count();
-        
-        $totalRunningBuyTTB = Buysell::where('is_running', '=', '1')
-            ->where('type', '=', 'buy')
-            ->select(DB::raw('SUM(tt_quantity - close_quanntity) as total'))
-            ->value('total');
-            
-        $totalRunningSellTTB = Buysell::where('is_running', '=', '1')
-            ->where('type', '=', 'sell')
-            ->select(DB::raw('SUM(tt_quantity - close_quanntity) as total'))
-            ->value('total');
-            
-        $totalRunningActiveTTB = $totalRunningBuyTTB - $totalRunningSellTTB;
-            
-       
-        $totalDepositAmount = Transaction::where('transaction_type', '=', 'deposit')
-            ->sum('transaction_amount');
+        $businessId = $request->session()->get('bussinessId');
+        $customerStats = Customer::where('business_id', $businessId)
+            ->selectRaw('COUNT(*) as total, SUM(status = "activated") as active, SUM(status = "deactived") as inactive')
+            ->first();
+        $runningStats = Buysell::where('business_id', $businessId)->where('is_running', 1)
+            ->selectRaw('SUM(CASE WHEN type = "buy" THEN tt_quantity - close_quanntity ELSE 0 END) as buy_ttb')
+            ->selectRaw('SUM(CASE WHEN type = "sell" THEN tt_quantity - close_quanntity ELSE 0 END) as sell_ttb')
+            ->first();
+        $transactionStats = Transaction::where('business_id', $businessId)
+            ->selectRaw('SUM(CASE WHEN transaction_type = "deposit" THEN transaction_amount ELSE 0 END) as deposits')
+            ->selectRaw('SUM(CASE WHEN transaction_type = "withdraw" THEN ABS(transaction_amount) ELSE 0 END) as withdrawals')
+            ->first();
 
-        $totalWithDrawAmount = Transaction::where('transaction_type', '=', 'withdraw')
-            ->select(DB::raw('SUM(ABS(transaction_amount)) as total'))
-            ->value('total');
-        
+        $totalCustomers = $customerStats->total ?? 0;
+        $activeCusomer = $customerStats->active ?? 0;
+        $deactiveCusomer = $customerStats->inactive ?? 0;
+        $totalRunningBuyTTB = $runningStats->buy_ttb ?? 0;
+        $totalRunningSellTTB = $runningStats->sell_ttb ?? 0;
+        $totalRunningActiveTTB = $totalRunningBuyTTB - $totalRunningSellTTB;
+        $totalDepositAmount = $transactionStats->deposits ?? 0;
+        $totalWithDrawAmount = $transactionStats->withdrawals ?? 0;
         $totalTransactionAmount = $totalDepositAmount + $totalWithDrawAmount;
 
 

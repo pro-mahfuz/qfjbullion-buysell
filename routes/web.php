@@ -21,16 +21,17 @@ use App\Http\Controllers\Client\TransactionController as ClientTransactionContro
 use App\Http\Middleware\ClientPFCheker;
 use App\Http\Middleware\otpcheckMiddleware;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Http;
+use App\Services\GoldService;
 
 use App\Http\Controllers\Client\Auth\LoginController as ClientLoginController;
 use App\Http\Controllers\Client\DashboardController as ClientDashboardController;
+
 
 Route::get('/rate', function () {
     $response = Http::get('https://qfjbullion.com/rate');
     $data = $response->json();
     return $data;
-});
+})->name('rate');
 
 
 Route::get('/auto-logout', function () {
@@ -173,6 +174,8 @@ Route::middleware(['auth:web', 'otpcheckMiddleware'])->prefix('admin')->name('ad
         Route::post('/save-bid', [BuySellController::class, 'saveBid'])->name('buysell.save.bid');
         Route::get('/show-trade', [BuySellController::class, 'showTrade'])->name('buysell.showtrade');
         Route::get('/deposit', [BuySellController::class, 'deposit'])->name('buysell.deposit')->middleware('acl:deposit_list');
+        Route::get('/deposit-list', [BuySellController::class, 'depositWithdrawList'])->defaults('type', 'deposit')->name('buysell.deposit.list')->middleware('acl:deposit_list');
+        Route::get('/withdraw-list', [BuySellController::class, 'depositWithdrawList'])->defaults('type', 'withdraw')->name('buysell.withdraw.list')->middleware('acl:withdraw_list');
         // Route::post('/deposit-save', [BuySellController::class, 'depositStore'])->name('buysell.deposit.save')->middleware('acl:deposit_add');
         // Route::post('/deposit-update', [BuySellController::class, 'depositUpdate'])->name('buysell.deposit.update')->middleware('acl:deposit_add');
         Route::post('/deposit-save', [BuySellController::class, 'depositStore'])->name('buysell.deposit.save');

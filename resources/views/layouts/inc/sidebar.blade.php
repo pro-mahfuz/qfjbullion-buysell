@@ -15,12 +15,12 @@
         @endcan
       
         @can('customer')
-            <li class="dropdown @yield('dashboard')">
+            <li class="dropdown @yield('customer_list')">
                 <a href="{{route('admin.customer.list')}}" class="nav-link"><i data-feather="user-check"></i><span>Customer List</span></a>
             </li>
             @can('customer_add')
-            <li class="dropdown @yield('dashboard')">
-                <a href="{{route('admin.customer.create')}}" class="nav-link"><i data-feather="user-check"></i><span>Customer Add</span></a>
+            <li class="dropdown @yield('customer_create')">
+                <a href="{{route('admin.customer.create')}}" class="nav-link"><i data-feather="plus"></i><span>Customer Add</span></a>
             </li>
             @endcan
         @endcan
@@ -30,28 +30,40 @@
         <li class="menu-header">Trade</li>
         @can('buysell')
         <li class="dropdown @yield('BuySell')">
-            <a href="{{route('admin.buysell.customer.search')}}" class="nav-link"><i data-feather="monitor"></i><span>Buy/Sell</span></a>
+            <a href="{{route('admin.buysell.customer.search')}}" class="nav-link"><i data-feather="dollar-sign"></i><span>Buy/Sell</span></a>
         </li>
         @endcan
         @can('Trading')
         <li class="dropdown @yield('RunningTrade')">
-            <a href="{{ route('admin.transaction.show.runningOpening', ['type' => '1']) }}" class="nav-link"><i data-feather="monitor"></i><span>Running Trade</span></a>
+            <a href="{{ route('admin.transaction.show.runningOpening', ['type' => '1']) }}" class="nav-link"><i data-feather="trending-up"></i><span>Running Trade</span></a>
+        </li>
+        <li class="dropdown @yield('ClosedTrade')">
+            <a href="{{ route('admin.transaction.show.completed', ['type' => '0']) }}" class="nav-link"><i data-feather="check-circle"></i><span>Closed Trade List</span></a>
         </li>
         @endcan
         @can('unmatched_trade')
         <li class="dropdown @yield('UnmatchTrade')">
-            <a href="{{route('admin.transaction.show.search')}}" class="nav-link"><i data-feather="monitor"></i><span>Unmatch Trade</span></a>
+            <a href="{{route('admin.transaction.show.search')}}" class="nav-link"><i aria-hidden="true" style="font-style:normal;font-size:18px;line-height:1;">≠</i><span>Unmatch Trade</span></a>
         </li>
         @endcan
         
         @can('deposit_add')
         <li class="menu-header">Transaction</li>
-        <li class="dropdown @yield('Deposit')">
-            <a href="{{route('admin.buysell.deposit_withdraw', ['customer_id' => 'null','type' => 'deposit'])}}" class="nav-link"><i data-feather="monitor"></i><span>Deposit</span></a>
+        @can('deposit_list')
+        <li class="dropdown @yield('DepositList')">
+            <a href="{{ route('admin.buysell.deposit.list') }}" class="nav-link"><i data-feather="list"></i><span>Deposit List</span></a>
         </li>
-        
+        @endcan
+        <li class="dropdown @yield('Deposit')">
+            <a href="{{route('admin.buysell.deposit_withdraw', ['customer_id' => 'null','type' => 'deposit'])}}" class="nav-link"><i data-feather="plus"></i><span>Deposit Add</span></a>
+        </li>
+        @can('withdraw_list')
+        <li class="dropdown @yield('WithdrawList')">
+            <a href="{{ route('admin.buysell.withdraw.list') }}" class="nav-link"><i data-feather="list"></i><span>Withdraw List</span></a>
+        </li>
+        @endcan
         <li class="dropdown @yield('Withdraw')">
-            <a href="{{route('admin.buysell.deposit_withdraw', ['customer_id' => 'null','type' => 'withdraw'])}}" class="nav-link"><i data-feather="monitor"></i><span>Withdraw</span></a>
+            <a href="{{route('admin.buysell.deposit_withdraw', ['customer_id' => 'null','type' => 'withdraw'])}}" class="nav-link"><i data-feather="plus"></i><span>Withdraw Add</span></a>
         </li>
         @endcan
         

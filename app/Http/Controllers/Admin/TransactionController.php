@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Buysell;
+use App\Models\Customer;
 use App\Services\CustomerService;
 use App\Services\TransactionService;
 use App\Traits\GolbalHelperTrait;
@@ -418,21 +419,28 @@ class TransactionController extends Controller
 
     public function runningTranShow(Request $request)
     {
-        $type = $request->type;
+        $type = $request->input('type', '1');
         $customers = $this->customerService->getCustomers();
-        $details = $this->transactionService->getRunningDetails();
-        $buyDetails = $this->transactionService->getRunningDetailByType('1', 'buy');
-        $sellDetails = $this->transactionService->getRunningDetailByType('1', 'sell');
-        
-        $transactions = $this->transactionService->getBuySellList($type);
-        //dd($transactions);
+        $query = Buysell::query()
+            ->where('is_running', $type)
+            ->where('business_id', session('bussinessId'))
+            ->when($request->filled('customer_id'), fn ($builder) => $builder->where('customer_id', $request->customer_id))
+            ->when(in_array($request->trade_type, ['buy', 'sell'], true), fn ($builder) => $builder->where('type', $request->trade_type))
+            ->when($request->filled('start_date'), fn ($builder) => $builder->whereDate('created_at', '>=', $request->start_date))
+            ->when($request->filled('end_date'), fn ($builder) => $builder->whereDate('created_at', '<=', $request->end_date));
+
+        $summary = (clone $query)->selectRaw('COUNT(*) as total_orders')
+            ->selectRaw('SUM(tt_quantity - close_quanntity) as net_ttb')
+            ->selectRaw('SUM(CASE WHEN type = "buy" THEN tt_quantity - close_quanntity ELSE 0 END) as buy_ttb')
+            ->selectRaw('SUM(CASE WHEN type = "sell" THEN tt_quantity - close_quanntity ELSE 0 END) as sell_ttb')
+            ->first();
+
+        $transactions = $query->with('customer')->latest()->paginate(25)->withQueryString();
 
         return view('admin.transaction.running-opening', [
             'type' => $type,
             'customers' => $customers,
-            'details' => $details,
-            'buyDetails' => $buyDetails,
-            'sellDetails' => $sellDetails,
+            'summary' => $summary,
             'transactions' => $transactions,
         ]);
     }
@@ -486,14 +494,29 @@ class TransactionController extends Controller
 
     public function completedTranShow(Request $request)
     {
-        $type = $request->type;
-        $customers = $this->customerService->getCustomers();
-        $details = $this->transactionService->getCompletedDetails();
+        $query = Transaction::query()
+            ->where('business_id', session('bussinessId'))
+            ->whereIn('transaction_type', ['buy', 'sell'])
+            ->when($request->filled('customer_id'), fn ($builder) => $builder->where('customer_id', $request->customer_id))
+            ->when(in_array($request->trade_type, ['buy', 'sell'], true), fn ($builder) => $builder->where('transaction_type', $request->trade_type))
+            ->when($request->filled('start_date'), fn ($builder) => $builder->whereDate('created_at', '>=', $request->start_date))
+            ->when($request->filled('end_date'), fn ($builder) => $builder->whereDate('created_at', '<=', $request->end_date));
+
+        $summary = (clone $query)->selectRaw('COUNT(*) as total_trades')
+            ->selectRaw('SUM(quantity) as total_quantity')
+            ->selectRaw('SUM(transaction_amount) as total_profit_loss')
+            ->selectRaw('SUM(CASE WHEN transaction_type = "buy" THEN 1 ELSE 0 END) as buy_count')
+            ->selectRaw('SUM(CASE WHEN transaction_type = "sell" THEN 1 ELSE 0 END) as sell_count')
+            ->first();
+
+        $transactions = $query->with('customer')->orderByDesc('created_at')->paginate(25)->withQueryString();
+        $linkedBuys = Buysell::whereIn('id', $transactions->pluck('reference_row')->filter()->unique())->get()->keyBy('id');
+        $transactions->getCollection()->each(fn ($transaction) => $transaction->linked_buy = $linkedBuys->get($transaction->reference_row));
 
         return view('admin.transaction.completed', [
-            'type' => $type,
-            'customers' => $customers,
-            'details' => $details
+            'customers' => Customer::orderBy('name')->get(['id', 'name', 'customer_code']),
+            'summary' => $summary,
+            'transactions' => $transactions,
         ]);
     }
 

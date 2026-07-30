@@ -104,8 +104,8 @@ class CustomerController extends Controller
             'id_proof' => ['required', 'string', 'max:255'],
             'id_number' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:255',],
-            'maxtt_per_K' => ['required', 'string', 'max:255'],
-            'service_charge' => ['required', 'string', 'max:255'],
+            'maxtt_per_K' => ['required', 'numeric', 'decimal:0,3'],
+            'service_charge' => ['required', 'numeric', 'decimal:0,3'],
         ];
         if (!$isEdit) {
           //  $data['phone'] = ['required', 'string', 'max:255', 'unique:customers,phone'];

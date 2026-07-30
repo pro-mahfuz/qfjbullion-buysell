@@ -27,7 +27,8 @@ class GoldService
                     // 'x-access-token' => 'goldapi-7q9uy0tkwrfdtlo-io',
                     // 'Content-Type' => 'application/json',
                     //https://gold.shadhinportal.com/api/gold?currency=usd
-                ])->get('https://furqanjewelry.com/api/get-gold-price');
+                ])->get('https://qfjbullion.com/rate');
+                //dd($response->json());
 
                 if ($response->failed()) {
                     throw new \Exception('API call failed: ' . $response->status());

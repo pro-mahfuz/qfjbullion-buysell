@@ -40,6 +40,35 @@
     border: 1px solid black !important;
   }
 </style>
+<style>
+    .statement-shell { border: 0; border-radius: 14px; box-shadow: 0 8px 28px rgba(16, 24, 40, .08); overflow: hidden; }
+    .statement-header { background: linear-gradient(120deg, #102a43, #1f5f74); color: #fff; border: 0; padding: 1.25rem 1.5rem; }
+    .statement-header h5 { color: #fff; font-weight: 700; letter-spacing: .01em; }
+    .statement-header .btn { border-radius: 6px; font-weight: 600; }
+    .statement-body { padding: 1.5rem; background: #f7f9fc; }
+    .statement-panel { background: #fff; border: 1px solid #e7edf4; border-radius: 10px; padding: 1.1rem 1.25rem; margin-bottom: 1.25rem; }
+    .statement-meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+    .statement-meta__item { color: #667085; font-size: .78rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .statement-meta__item strong { display: block; margin-top: .3rem; color: #101828; font-size: .98rem; font-weight: 600; letter-spacing: 0; text-transform: none; }
+    .statement-filter { display: flex; align-items: end; gap: .75rem; flex-wrap: wrap; }
+    .statement-filter .form-group { margin: 0; min-width: 175px; }
+    .statement-filter label { display: block; margin-bottom: .25rem; color: #475467; font-size: .78rem; font-weight: 700; }
+    .statement-filter .btn { line-height: 30px !important; padding-top: 0; padding-bottom: 0; }
+    .statement-filter__action { min-width: auto !important; }
+    .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .85rem; }
+    .metric { border: 1px solid #e7edf4; border-radius: 8px; padding: .85rem; background: #fff; }
+    .metric__label { display: block; color: #667085; font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .metric__value { display: block; margin-top: .35rem; color: #101828; font-size: 1.08rem; font-weight: 700; }
+    .statement-section { margin: 1.75rem 0 .65rem; color: #102a43; font-size: 1.05rem; font-weight: 700; }
+    .statement-table { margin-bottom: 0; background: #fff; }
+    .statement-table thead th { background: #eef3f8; border-color: #dce5ef; color: #344054; font-size: .72rem !important; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; }
+    .statement-table td { border-color: #e7edf4; vertical-align: middle; }
+    .statement-table .table-active td { background: #f2f8f6; }
+    .position-summary { display: flex; flex-wrap: wrap; gap: .65rem 1.25rem; color: #475467; font-size: .86rem; }
+    .position-summary strong { color: #101828; }
+    @media (max-width: 991px) { .statement-meta, .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 575px) { .statement-meta, .metric-grid { grid-template-columns: 1fr; } .statement-body { padding: 1rem; } }
+</style>
 @if (isset($runningBuySell))
     <?php $runningTTB_profit = 0; ?>
     @foreach ($runningBuySell as $transaction)
@@ -99,10 +128,10 @@
             <!--    </div>-->
             <!--</form>-->
 
-            <div class="card">
-                <div class="card-header">
+            <div class="card statement-shell">
+                <div class="card-header statement-header">
                     <div class="col-md-4 p-0">
-                        <h5>Customer Statement</h5>
+                        <h5 class="mb-0">Customer Statement</h5>
                         
                     </div>
                     <div class="col-md-8 text-right p-0">
@@ -136,129 +165,55 @@
                     </div>
                 </div>
 
-                <div class="card-body" style="background: #fff;color:#000;">
-                    <!-- Customer Information -->
-                    <div class="d-flex justify-content-between">
-                        <p><strong>Full Name:</strong> {{ $customer->name ?? 'N/A' }} ({{ $customer->customer_code }})</p>
-                        <p><strong>Date:</strong> {{ request('start_date') ? date("d-M-Y",strtotime(request('start_date'))) : now() }}
-                            {{ request('end_date') ? ' to ' . date("d-M-Y",strtotime(request('end_date'))) : '' }}</p>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <p><strong>Market Price:</strong> <span
-                                id="marketPrice">{{ number_format($market_price, 2) }}</span></p>
-
-                        <p>
-
-                            <strong>Cut Position:</strong> <span style="font-size: 20px;">
-                                @if ($value < 0)
-                                    {{ $customer->cutposition }}
-                                    (Sell)
-                                @elseif ($value > 0)
-                                    {{ $customer->cutposition }}
-                                    (Buy)
-                                @else
-                                    0
-                                @endif
-                            </span>
-                            </span>
-                        </p>
+                <div class="card-body statement-body">
+                    <div class="statement-panel">
+                        <form method="GET" action="{{ route('admin.transaction.show.statement') }}" class="statement-filter">
+                            <input type="hidden" name="id" value="{{ $customer->id }}">
+                            <input type="hidden" name="type" value="statement">
+                            <input type="hidden" name="goldValue" value="{{ $market_price }}">
+                            <div class="form-group"><label for="start_date">From</label><input type="date" name="start_date" id="start_date" class="form-control" value="{{ request('start_date') }}"></div>
+                            <div class="form-group"><label for="end_date">To</label><input type="date" name="end_date" id="end_date" class="form-control" value="{{ request('end_date') }}"></div>
+                            <div class="form-group statement-filter__action">
+                                <button type="submit" class="btn btn-primary btn-sm">Apply period</button>
+                                <a href="{{ route('admin.transaction.show.statement', ['id' => $customer->id, 'type' => 'statement', 'goldValue' => $market_price]) }}" class="btn btn-outline-secondary btn-sm">Clear dates</a>
+                            </div>
+                        </form>
                     </div>
 
-                    <h4>Balance Information</h4>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-sm">
-                            <thead class="thead-dark">
-                                <tr>
-                                    
-                                    <th>Deposit</th>
-                                    <th>Withdraw</th>
-                                    <th>Profit-Loss</th>
-                                    <th>Balance </th>
-                                    <!--<th>Gold (Onz)</th>-->
-                                    <th>Gold (TTB)</th>
+                    <div class="statement-panel statement-meta">
+                        <div class="statement-meta__item">Customer<strong>{{ $customer->name ?? 'N/A' }} ({{ $customer->customer_code }})</strong></div>
+                        <div class="statement-meta__item">Statement period<strong>{{ request('start_date') ? date('d M Y', strtotime(request('start_date'))) : 'All activity' }}{{ request('end_date') ? ' — ' . date('d M Y', strtotime(request('end_date'))) : '' }}</strong></div>
+                        <div class="statement-meta__item">Market price<strong id="marketPrice">$ {{ number_format($market_price, 2) }}</strong></div>
+                    </div>
 
-                                    <th>Total Value ($)</th>
-                                    <th>Total Value (AED)</th>
-                                    <!--<th>Equity P&L ($)</th>-->
-                                    <th>Equity (AED)</th>
-                                    <!-- <th>Net Balance</th> -->
-                                    <th>Withdrawable</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    @php
-                                        $profiLoss = $deposit + $withdraw + ($profit - $loss);
-                                    @endphp
-                                    
-                                    <td>{{ $data['sum_of_deposit'], 2 }}</td>
-                                    <td>{{ $data['sum_of_withdraw'], 2 }}</td>
-                                    <td>{{ number_format((float) str_replace(',', '', $data['current_profit_loss']), 2) }}</td>
-                                    <td>{{ number_format($data['current_balance'], 2) }}</td>
-                                    <!--<td>{{ abs($value * 3.746) }}</td>-->
-                                    <td>{{ abs($data['sum_of_running_buy_ttb'] - $data['sum_of_running_sell_ttb']) }} {{$data['sum_of_running_buy_ttb'] - $data['sum_of_running_sell_ttb'] < 0 ? 'Sell' : 'Buy'}}</td>
-                                    <td> {{ $value != 0 ? number_format((($market_price) * abs($value)), 2):0 }}</td>
-                                    <td> {{ $value != 0 ? number_format((($market_price) * abs($value) * 13.7628), 2):0 }} </td>
-
-                                    @php
-                                    $current_balance = $data['current_balance'];
-                                    $sum_of_running_running_profit_loss = $data['sum_of_running_running_profit_loss'];
-                                    $sum_of_running_service_charge = 1*($data['sum_of_running_buy_ttb'] + $data['sum_of_running_sell_ttb']) * 13.7628;
-                                    $last_equity = $current_balance + $runningTTB_profit ;
-                                    
-                                    @endphp
-                                    <!--<td>{{ is_numeric($equity) ? number_format($equity / 3.6715, 2) : '0' }}</td>-->
-                                    <td>{{ number_format($last_equity, 2) }}</td>
-                                    
-                                    @php 
-                                        $active_ttb = abs($data['sum_of_running_buy_ttb'] - $data['sum_of_running_sell_ttb']);
-                                        $equity = $data['equity'] - ($data['sum_of_running_service_charge'] * 13.7628);
-                                        
-                                        $margin_gap = $active_ttb != 0 
-                                            ? $equity / $active_ttb 
-                                            : 0;
-                                    
-                                        $withdraw = $value != 0 
-                                            ? number_format($equity - $margin_gap, 2) 
-                                            : 0;
-                                    @endphp
-                                    <td>{{ $withdraw }}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
+                    <h4 class="statement-section">Account overview</h4>
+                    @php
+                        $netTtb = $data['sum_of_running_buy_ttb'] - $data['sum_of_running_sell_ttb'];
+                        $activeTtb = abs($netTtb);
+                        $netEquity = $data['equity'] - ($data['sum_of_running_service_charge'] * 13.7628);
+                        $withdrawable = $value != 0 && $activeTtb != 0 ? $netEquity - ($netEquity / $activeTtb) : 0;
+                    @endphp
+                    <div class="metric-grid">
+                        <div class="metric"><span class="metric__label">Deposits</span><span class="metric__value">AED {{ $data['sum_of_deposit'] }}</span></div>
+                        <div class="metric"><span class="metric__label">Withdrawals</span><span class="metric__value">AED {{ $data['sum_of_withdraw'] }}</span></div>
+                        <div class="metric"><span class="metric__label">Realised P/L</span><span class="metric__value">AED {{ number_format((float) str_replace(',', '', $data['current_profit_loss']), 2) }}</span></div>
+                        <div class="metric"><span class="metric__label">Cash balance</span><span class="metric__value">AED {{ number_format($data['current_balance'], 2) }}</span></div>
+                        <div class="metric"><span class="metric__label">Net gold position</span><span class="metric__value">{{ $activeTtb }} TTB {{ $netTtb < 0 ? 'Sell' : ($netTtb > 0 ? 'Buy' : '') }}</span></div>
+                        <div class="metric"><span class="metric__label">Position value</span><span class="metric__value">AED {{ $value != 0 ? number_format($market_price * abs($value) * 13.7628, 2) : '0.00' }}</span></div>
+                        <div class="metric"><span class="metric__label">Equity</span><span class="metric__value">AED {{ number_format($netEquity, 2) }}</span></div>
+                        <div class="metric"><span class="metric__label">Withdrawable</span><span class="metric__value">AED {{ number_format($withdrawable, 2) }}</span></div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-3">
-                            <h4 class="mt-5">Active Positions</h4>
-                        </div>
-                        <div class="col-md-9">
-                            <p class="mt-5"><span>Buy Qty : {{ $sumBuy }}</span> | <span>Sell Qty:
-                                    {{ $sumSell }}</span> | <span>Net Qty : {{ abs($value) }} @if ($value < 0)
-                                        (Sell Position)
-                                    @else
-                                        ( Buy Position)
-                                    @endif
-                                </span> | <span>Total P/L : {{ number_format($runningTTB_profit, 2) }}</span> | 
-                                
-                                <span>
-                                    Cut Position:
-                                        @if ($value < 0)
-                                            {{ $customer->cutposition }}
-                                            (Sell)
-                                        @elseif ($value > 0)
-                                            {{ $customer->cutposition }}
-                                            (Buy)
-                                        @else
-                                            0
-                                        @endif
-                                </span>
-                            </span></p>
-                        </div>
+                    <h4 class="statement-section">Active positions</h4>
+                    <div class="statement-panel position-summary">
+                        <span>Buy quantity: <strong>{{ $sumBuy }}</strong></span>
+                        <span>Sell quantity: <strong>{{ $sumSell }}</strong></span>
+                        <span>Net position: <strong>{{ abs($value) }} {{ $value < 0 ? 'Sell' : ($value > 0 ? 'Buy' : '') }}</strong></span>
+                        <span>Unrealised P/L: <strong>AED {{ number_format($runningTTB_profit, 2) }}</strong></span>
+                        <span>Cut position: <strong>{{ $value == 0 ? '0' : $customer->cutposition . ' (' . ($value < 0 ? 'Sell' : 'Buy') . ')' }}</strong></span>
                     </div>
-                    <table class="table table-striped table-bordered">
+                    <div class="table-responsive">
+                    <table class="table table-striped table-bordered statement-table">
 
                         <thead>
                             <tr>
@@ -343,11 +298,12 @@
                         </tbody>
 
                     </table>
+                    </div>
 
                     <!-- Profit and Loss Summary Table -->
-                    <h4 class="mt-4">Profit and Loss Summary</h4>
+                    <h4 class="statement-section">Closed trades</h4>
                     <div class="table-responsive">
-                        <table class="table table-bordered table-sm">
+                        <table class="table table-bordered table-sm statement-table">
 
                             <thead class="thead-dark">
                                 <tr>
@@ -404,10 +360,10 @@
                     @if (isset($pending) && count($pending) > 0)
 
 
-                        <h4 class="mt-4">Pending</h4>
+                        <h4 class="statement-section">Pending orders</h4>
 
                         <div class="table-responsive mt-3">
-                            <table class="table table-bordered table-sm">
+                            <table class="table table-bordered table-sm statement-table">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th scope="col">#</th>

@@ -115,6 +115,7 @@
                                 <th scope="col">Profit/Loss (AED)</th>
                                 <th scope="col">TP</th>
                                 <th scope="col">SL</th>
+                                <th scope="col">Days</th>
                                 <th scope="col">Created By</th>
                                 @can('update_running_trade')
                                 <th scope="col" style="witdh: 280px">Action</th>
@@ -152,6 +153,9 @@
                                         <td id="balance-{{ $sl }}" style="text-align: center;"></td>
                                         <td style="text-align: center;"> {{ $transaction->take_profit }} </td>
                                         <td style="text-align: center;"> {{ $transaction->stop_loss }} </td>
+                                        <td style="text-align: center;">
+                                            {{ $transaction->created_at->copy()->startOfDay()->diffInDays(now()->startOfDay()) }}
+                                        </td>
                                         <td style="text-align: center;"> {{ $transaction->created_by }} </td>
                                         @can('update_running_trade')
                                         <td style="text-align: center;">
@@ -297,6 +301,7 @@
 <script>
     let previousPrice = null;
     let isFetching = false;
+    let rateErrorShown = false;
     var usdToAedRate = 3.674;
 
     var maxtt_per_K = @json($maxtt_per_K);
@@ -345,19 +350,19 @@
 
         isFetching = true;
         try {
-            const response = await fetch('https://buysell.qfjbullion.com/rate', {
+            const response = await fetch("{{ route('rate') }}", {
                 method: 'GET',
             });
 
-         
-
-      
-
             if (!response.ok) {
-                fire('Error fetching the gold price');
+                throw new Error('Gold rate service returned an error');
             }
 
             let data = await response.json();
+            if (!Number.isFinite(Number(data.value))) {
+                throw new Error('Gold rate service returned an invalid rate');
+            }
+            rateErrorShown = false;
             
             let sellPrice = data.value - 0.53;
             let sellDiv = document.getElementById('sellrate');
@@ -447,6 +452,10 @@
 
         } catch (error) {
             console.error('Error fetching the gold price:', error);
+            if (!rateErrorShown) {
+                fire('Unable to fetch the current gold price. Retrying…');
+                rateErrorShown = true;
+            }
         } finally {
             isFetching = false;
         }

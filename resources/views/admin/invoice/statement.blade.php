@@ -2,14 +2,12 @@
 <html lang="en">
 
 <head>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-
-    <!-- Custom CSS -->
     <style>
+        @page { margin: 20px 22px 30px; }
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
+            font-family: DejaVu Sans, Arial, sans-serif;
+            color: #1f2937;
+            font-size: 9px;
         }
 
         h1,
@@ -126,6 +124,24 @@
             border: 1px solid #3b3c3c;
             background-color: #c5c8c8 !important;
         }
+        .report-header { padding-bottom: 10px; margin-bottom: 6px; }
+        .report-title { color: #102a43; font-size: 20px; font-weight: bold; margin: 0; }
+        .report-subtitle { color: #667085; font-size: 9px; margin: 4px 0 0; }
+        .meta-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
+        .meta-table td { border: 0; padding: 3px 0; text-align: left; font-size: 9px; }
+        .meta-table .label { color: #667085; font-size: 8px; font-weight: bold; text-transform: uppercase; }
+        .meta-table .right { text-align: right; }
+        .snapshot-table { width: 100%; border-collapse: separate; border-spacing: 5px; margin: 8px -5px 10px; }
+        .snapshot-table td { width: 25%; background: #f3f7fa; border: 1px solid #d9e4ea; padding: 7px; text-align: left; }
+        .snapshot-table .label { display: block; color: #667085; font-size: 7px; font-weight: bold; text-transform: uppercase; }
+        .snapshot-table .value { display: block; color: #102a43; font-size: 11px; font-weight: bold; margin-top: 3px; }
+        .section-title { color: #102a43; font-size: 11px; font-weight: bold; margin: 13px 0 4px; padding-bottom: 3px; border-bottom: 1px solid #cbd5e1; }
+        .summary-table th { background: #1f5f74 !important; color: #fff; border-color: #1f5f74; font-size: 7px; }
+        .summary-table td { font-size: 8px; }
+        .data-table th { background: #eaf0f4 !important; color: #344054; border-color: #cbd5e1; font-size: 7px; }
+        .data-table td { font-size: 8px; }
+        .total-row td { background: #eef7f3; }
+        .report-footer { position: fixed; bottom: -18px; left: 0; right: 0; color: #667085; font-size: 7px; text-align: center; }
     </style>
 
 </head>
@@ -162,7 +178,7 @@
     <div class="row">
         <div class="col-md-12">
             
-            <div class="header">
+            <div class="report-header">
                 <!--<h3 style="text-align: center;width: 270px;margin: 0 auto;margin-bottom: -50px;padding: 5px;border:1px solid #3b3c3c; border-radius: 25px"> Customer Statement</h1>-->
                 <!--    <p style="margin:0px; padding: 0px;"><strong>Full Name:</strong> {{ $customer->name ?? 'N/A' }} ({{ $customer->customer_code }})-->
                 <!--        <span style="text-align: right;float:right;"><strong>Market Price:</strong>-->
@@ -186,40 +202,27 @@
                 <!--        </span>-->
                 <!--    </p>-->
                     
-                    <h3 style="text-align: center;width: 270px;margin: 0 auto;margin-bottom: -50px;padding: 5px;border:1px solid #3b3c3c; border-radius: 25px"> Customer Statement</h1>
-                    <p style="margin:0px; padding: 0px;"><strong>Name:</strong> {{ $customer->name ?? 'N/A' }} ({{ $customer->customer_code }})
-                        <span style="text-align: right;float:right;"><strong>Date: </strong>{{ request('startDate') ? date("d-M-Y",strtotime(request('startDate'))): date("d-M-Y",strtotime("NOW")) }}
-                            {{ request('endDate') ? ' to ' . date("d-M-Y",strtotime(request('endDate'))) : '' }}
-                        </span>
-                    </p>
-        
-                    <p>
-                        
-                    </p>
-                    
-                    <div class="col-md-12" style="text-align: center;">
-                            <p class="mt-5" style="font-weight: bold; font-size: 14px;"><span><span>Market Price: {{ number_format($market_price, 2) }}</span> |Buy Qty : {{ $sumBuy }}</span> | <span>Sell Qty:
-                                    {{ $sumSell }}</span> | <span>Active Qty : {{ abs($value) }} @if ($value < 0)
-                                        (Sell Position)
-                                    @else
-                                        ( Buy Position)
-                                    @endif
-                                </span> | <span>Total P/L : {{ number_format($runningTTB_profit, 2) }}</span> | 
-                                
-                                <span>
-                                    Cut Position:
-                                        @if ($value < 0)
-                                            {{ $customer->cutposition }}
-                                            (Sell)
-                                        @elseif ($value > 0)
-                                            {{ $customer->cutposition }}
-                                            (Buy)
-                                        @else
-                                            0
-                                        @endif
-                                </span>
-                            </span></p>
-                        </div>
+                    @php
+                        $statementStart = request('start_date', request('startDate'));
+                        $statementEnd = request('end_date', request('endDate'));
+                        $positionLabel = $value < 0 ? 'Sell' : ($value > 0 ? 'Buy' : 'Flat');
+                    @endphp
+                    <h1 class="report-title">Customer Statement</h1>
+                    <p class="report-subtitle">Account activity and open-position valuation</p>
+                    <table class="meta-table">
+                        <tr>
+                            <td><span class="label">Customer</span><br><strong>{{ $customer->name ?? 'N/A' }} ({{ $customer->customer_code }})</strong></td>
+                            <td class="right"><span class="label">Statement period</span><br><strong>{{ $statementStart ? date('d M Y', strtotime($statementStart)) : 'All activity' }}{{ $statementEnd ? ' — ' . date('d M Y', strtotime($statementEnd)) : '' }}</strong></td>
+                        </tr>
+                    </table>
+                    <table class="snapshot-table">
+                        <tr>
+                            <td><span class="label">Market price</span><span class="value">$ {{ number_format($market_price, 2) }}</span></td>
+                            <td><span class="label">Net position</span><span class="value">{{ abs($value) }} TTB {{ $positionLabel }}</span></td>
+                            <td><span class="label">Open P/L</span><span class="value">AED {{ number_format($runningTTB_profit, 2) }}</span></td>
+                            <td><span class="label">Cut position</span><span class="value">{{ $value == 0 ? '0' : $customer->cutposition . ' (' . $positionLabel . ')' }}</span></td>
+                        </tr>
+                    </table>
             </div>
 
             <div class="card">
@@ -248,9 +251,9 @@
                     <!--        </span></p>-->
                     <!--    </div>-->
                     
-                    <h4 style="margin:0px; padding:0px;">Balance Information</h4>
+                    <h4 class="section-title">Account overview</h4>
                     <div class="table-responsive pt-0 mt-0">
-                        <table class="table table-bordered table-sm">
+                        <table class="table table-bordered table-sm summary-table">
                             <thead class="thead-dark">
                                 <tr>
                                     
@@ -316,10 +319,10 @@
                     
                     <div class="row">
                         <div class="col-md-3">
-                            <h4 class="mt-5" style="margin-bottom:0px; padding:0px;">Active Positions</h4>
+                            <h4 class="section-title">Active positions</h4>
                         </div>
                     </div>
-                    <table class="table table-striped table-bordered">
+                    <table class="table table-striped table-bordered data-table">
 
                         <thead>
                             <tr>
@@ -406,9 +409,9 @@
                     </table>
 
                     <!-- Profit and Loss Summary Table -->
-                    <h4 class="mt-4" style="margin-bottom:0px; padding:0px;">Profit and Loss Summary</h4>
+                    <h4 class="section-title">Closed trades</h4>
                     <div class="table-responsive">
-                        <table class="table table-bordered table-sm">
+                        <table class="table table-bordered table-sm data-table">
 
                             <thead class="thead-dark">
                                 <tr>
@@ -465,10 +468,10 @@
                     @if (isset($pending) && count($pending) > 0)
 
 
-                        <h4 class="mt-4" style="margin-bottom:0px; padding:0px;">Pending</h4>
+                        <h4 class="section-title">Pending orders</h4>
 
                         <div class="table-responsive mt-3">
-                            <table class="table table-bordered table-sm">
+                            <table class="table table-bordered table-sm data-table">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th scope="col">#</th>
@@ -506,7 +509,9 @@
         </div>
     </div>
 
-    
+    <div class="report-footer">
+        Generated {{ now()->format('d M Y, H:i') }} · {{ $customer->customer_code }} · All amounts are shown in AED unless stated otherwise.
+    </div>
 </body>
 
 </html>

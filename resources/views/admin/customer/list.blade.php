@@ -1,190 +1,78 @@
 @extends('layouts.master')
 
-
 @section('title', 'Customer List')
+@section('customer_list', 'active')
 
-@section('content_header')
-
-    <div class="row">
-        <div class="col-md-8">
-            <h1> <i class="fa fa-users"></i> Customer List</h1>
-        </div>
-        <div class="col-md-4 d-flex justify-content-end">
-            <a href="{{ route('admin.customer.create') }}" class="btn btn-success">
-                <i class="fa fa-plus"></i> Create Customer
-            </a>
-        </div>
-    </div>
-
-
-@stop
-<style>
-	.recent-report__chart{
-		margin-left: -30px;
-	}
-	.apexcharts-legend{
-		margin-right: 30px;
-		margin-top: 45px;
-		margin-left: 10px;
-	}
-	#navbar_search_box{
-		margin-top:10px;
-	}
-
-</style>
-<style>
-  .table td, .table th {
-    padding: .25rem !important;
-    font-size: .85rem !important;
-	height: 20px !important;
-  }
-
-  .modal-title{
-      color: #000000 !important;
-  }
-  .pagination {
-      margin-top: -25px;
-  }
-
-  .page-link {
-    padding: 0.2rem 0.5rem !important;
-  }
-</style>
-<style>
-  .custom-bordered th,
-  .custom-bordered td,
-  .custom-bordered {
-    border: 1px solid black !important;
-  }
-</style>
 @section('content')
+    <style>
+        .customer-hero { background: linear-gradient(120deg, #102a43, #1f5f74); border-radius: .75rem; color: #fff; padding: 1.35rem 1.5rem; }
+        .customer-hero h3 { color: #fff; font-weight: 700; margin: 0; }
+        .customer-stat { background: #fff; border: 1px solid #e4e7ec; border-radius: .55rem; height: 100%; padding: .9rem 1rem; }
+        .customer-stat small { color: #667085; display: block; font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+        .customer-stat strong { color: #102a43; display: block; font-size: 1.2rem; margin-top: .3rem; }
+        .customer-table { font-size: .85rem; }
+        .customer-table th { background: #f1f5f9; border-color: #dbe4ee; color: #334155; font-size: .71rem; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+        .customer-table td { border-color: #e8eef5; vertical-align: middle; }
+        .customer-table .metric { display: block; color: #667085; font-size: .74rem; }
+        .customer-table .metric strong { color: #1e293b; font-size: .86rem; }
+    </style>
 
-<ul class="breadcrumb breadcrumb-style">
-		<li class="breadcrumb-item">
-		  	<a href="{{route('admin.dashboard.buysell')}}">
-				<i class="fas fa-home"></i>
-			</a>
-		</li>
-		<li class="breadcrumb-item active">Customer List</li>
-	</ul>
+    @php
+        $customerCount = count($customers);
+        $activeCustomers = collect($customers)->where('status', '!=', 'deactived')->count();
+        $totalBalance = collect($customers)->sum(fn ($customer) => (float) str_replace(',', '', $customer->current_balance ?? 0));
+    @endphp
 
+    <section class="section">
+        <ul class="breadcrumb breadcrumb-style">
+            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.buysell') }}"><i class="fas fa-home"></i></a></li>
+            <li class="breadcrumb-item active">Customer List</li>
+        </ul>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Customer List</h5>
-                    <a href="#" onclick="window.history.back()" class="btn btn-danger">Back</a>
-                </div>
-                <div class="card-body table-responsive">
-                    <table id="customer-table" class="table table-striped table-bordered table-sm" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th style="text-align: center;">SL </th>
-                                <th style="text-align: center;"> Code </th>
-                                <th style="text-align: center;">Full Nane</th>
-                                <th style="text-align: center;">Mobile</th>
-                                {{-- <th>Email</th> --}}
-                                <th style="text-align: center;">Status</th>
-                                <th style="text-align: center;"> Deposit (AED)</th>
-                                <th style="text-align: center;"> Buy TTB</th>
-                                <th style="text-align: center;"> Sell TTB</th>
-                                <th style="text-align: center;"> Active TTB</th>
-                                <th style="text-align: center;">Balance (AED)</th>
-                                <th style="text-align: center;">Equity (AED)</th>
-                                <th style="text-align: center;">Margin Gap ($)</th>
-                                <th style="text-align: center;">Cut Position (AED)</th>
-                                @if (auth()->user()->can('users_edit') == true)
-                                    <th style="text-align: center;">Action</th>
-                                @endif
-                            </tr>
-                        </thead>
+        <div class="customer-hero d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div><h3>Customers</h3><p class="mb-0 mt-1">Customer accounts, balances, and live position exposure.</p></div>
+            <div class="mt-3 mt-md-0"><button type="button" class="btn btn-danger mr-2" onclick="window.history.back()">Back</button>@can('customer_add')<a href="{{ route('admin.customer.create') }}" class="btn btn-light"><i class="fa fa-plus mr-1"></i> Customer Add</a>@endcan</div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-3 mb-2"><div class="customer-stat"><small>Total customers</small><strong>{{ $customerCount }}</strong></div></div>
+            <div class="col-md-3 mb-2"><div class="customer-stat"><small>Active customers</small><strong>{{ $activeCustomers }}</strong></div></div>
+            <div class="col-md-4 mb-2"><div class="customer-stat"><small>Combined cash balance</small><strong>AED {{ number_format($totalBalance, 2) }}</strong></div></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center"><h5 class="mb-0">Customer directory</h5><small class="text-muted">Use search to quickly find a customer or phone number.</small></div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="customer-table" class="table table-hover customer-table mb-0" style="width:100%">
+                        <thead><tr><th>#</th><th>Customer</th><th>Contact</th><th>Status</th><th>Cash position</th><th>Gold position</th><th>Equity &amp; margin</th><th>Actions</th></tr></thead>
                         <tbody>
-                            @if (count($customers) > 0)
-                                <?php $sl = 0; ?>
-                                @foreach ($customers as $row)
-                                    <?php $sl++; ?>
-                                    <tr>
-                                        <td style="text-align: center;">{{ $sl }}</td>
-                                        <td> 
-                                            @if (auth()->user()->can('customer_deatils') == true)
-                                                <a href="{{ route('admin.buysell.customer.search', ['customer' => $row->customer_code]) }}" class="link link-primary">{{ $row->customer_code }} </a>
-                                            @else
-                                                {{ $row->customer_code }}
-                                            @endif
-                                        </td>
-                                        <td style="text-align: center;"> {{ $row->name }} </td>
-                                        <td style="text-align: center;">{{ $row->phone }}</td>
-                                        <td style="text-align: center;">
-                                            @if (auth()->user()->can('users_edit') == true)
-                                                @if ($row->status == 'deactived')
-                                                    <form action="{{ route('admin.customer.enable', ['id' => $row->id]) }}"
-                                                        method="POST" style="margin-bottom:0px !important;">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill ml-1">
-                                                            Pending
-                                                        </button>
-                                                    </form>
-                                                @else
-                                                    <form action="{{ route('admin.customer.disable', ['id' => $row->id]) }}"
-                                                        method="POST" style="margin-bottom:0px !important;">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-outline-success btn-sm rounded-pill ml-1">Approved</button>
-                                                    </form>
-                                                @endif
-                                            @else
-                                                @if ($row->status == 'deactived')
-                                                    <span class="badge badge-danger">Pending</span>
-                                                @else
-                                                    <span class="badge badge-success">Approved</span>
-                                                @endif
-                                            @endif
-
-                                        </td>
-                                        <td style="text-align: center;">{{ $row->sum_of_deposit }}</td>
-                                        <td style="text-align: center;">{{ $row->sum_of_running_buy_ttb }}</td>
-                                        <td style="text-align: center;">{{ $row->sum_of_running_sell_ttb }}</td>
-                                        <td style="text-align: center;">{{ abs($row->sum_of_running_buy_ttb - $row->sum_of_running_sell_ttb)}} {{ ($row->sum_of_running_buy_ttb - $row->sum_of_running_sell_ttb) > 0 ? ' - buy' : (($row->sum_of_running_buy_ttb - $row->sum_of_running_sell_ttb) < 0 ? ' - sell' : '') }}</td>
-                                        <td style="text-align: center;">{{ number_format($row->current_balance, 2) }}</td>
-                                        <td style="text-align: center;">{{ number_format($row->equity - $row->sum_of_running_service_charge)}}</td>
-                                        <td style="text-align: center;">{{ number_format($row->margin_gap)}}</td>
-                                        <td style="text-align: center;">{{ number_format($row->margin)}}</td>
-
-                                        <td style="text-align: center;">
-                                            @can('customer_deatils')
-                                                <a href="{{ route('admin.buysell.customer.search', ['customer' => $row->customer_code]) }}"
-                                                    class="btn btn-primary btn-sm p-1 ml-1"><i class="fa fa-eye fa-sm">Buy/Sell</i>
-                                                </a>
-                                            @endcan
-                                            @can('users_edit')
-                                                <a href="{{ route('admin.customer.edit', $row->id) }}"
-                                                    class="btn btn-info btn-sm p-1"><i class="fa fa-edit">Edit</i>
-                                                </a>
-                                            @endcan
-
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @endif
+                            @foreach ($customers as $row)
+                                @php $netTtb = $row->sum_of_running_buy_ttb - $row->sum_of_running_sell_ttb; @endphp
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td><strong>{{ $row->name }}</strong><span class="metric">{{ $row->customer_code }}</span></td>
+                                    <td>{{ $row->phone ?: '—' }}<span class="metric">{{ $row->email ?: '' }}</span></td>
+                                    <td>
+                                        @if ($row->status === 'deactived')<span class="badge badge-warning">Pending</span>@else<span class="badge badge-success">Active</span>@endif
+                                    </td>
+                                    <td><span class="metric">Deposit <strong>AED {{ $row->sum_of_deposit }}</strong></span><span class="metric">Balance <strong>AED {{ number_format($row->current_balance, 2) }}</strong></span></td>
+                                    <td><span class="metric">Buy <strong>{{ $row->sum_of_running_buy_ttb }}</strong> · Sell <strong>{{ $row->sum_of_running_sell_ttb }}</strong></span><span class="metric">Net <strong>{{ abs($netTtb) }} {{ $netTtb > 0 ? 'Buy' : ($netTtb < 0 ? 'Sell' : '') }}</strong></span></td>
+                                    <td><span class="metric">Equity <strong>AED {{ number_format($row->equity - $row->sum_of_running_service_charge, 2) }}</strong></span><span class="metric">Margin <strong>{{ number_format($row->margin_gap, 2) }}</strong></span></td>
+                                    <td class="text-nowrap">
+                                        @can('customer_deatils')<a href="{{ route('admin.buysell.customer.search', ['customer' => $row->customer_code]) }}" class="btn btn-outline-primary btn-sm">Trade</a>@endcan
+                                        @can('users_edit')<a href="{{ route('admin.customer.edit', $row->id) }}" class="btn btn-outline-info btn-sm">Edit</a>@endcan
+                                    </td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 @stop
 
 @section('page_js')
-
-    <script>
-        $(document).ready(function() {
-            $('#customer-table').DataTable({
-                responsive: true,
-                pageLength: 10,
-                lengthChange: true
-            });
-        });
-    </script>
+    <script>$(function () { $('#customer-table').DataTable({ responsive: true, pageLength: 25, lengthChange: true, order: [[1, 'asc']] }); });</script>
 @endsection
-
-
