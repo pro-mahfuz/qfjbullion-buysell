@@ -29,9 +29,9 @@
 
         <div class="row mb-4">
             <div class="col-md-3 mb-2"><div class="running-stat"><small>Open trades</small><strong>{{ $summary->total_orders ?? 0 }}</strong></div></div>
-            <div class="col-md-3 mb-2"><div class="running-stat"><small>Open buy TTB</small><strong>{{ number_format($summary->buy_ttb ?? 0, 2) }}</strong></div></div>
-            <div class="col-md-3 mb-2"><div class="running-stat"><small>Open sell TTB</small><strong>{{ number_format($summary->sell_ttb ?? 0, 2) }}</strong></div></div>
-            <div class="col-md-3 mb-2"><div class="running-stat"><small>Net open TTB</small><strong>{{ number_format(($summary->buy_ttb ?? 0) - ($summary->sell_ttb ?? 0), 2) }}</strong></div></div>
+            <div class="col-md-3 mb-2"><div class="running-stat"><small>Open buy TTB</small><strong>{{ number_format($summary->buy_ttb ?? 0, 3) }}</strong></div></div>
+            <div class="col-md-3 mb-2"><div class="running-stat"><small>Open sell TTB</small><strong>{{ number_format($summary->sell_ttb ?? 0, 3) }}</strong></div></div>
+            <div class="col-md-3 mb-2"><div class="running-stat"><small>Net open TTB</small><strong>{{ number_format(($summary->buy_ttb ?? 0) - ($summary->sell_ttb ?? 0), 3) }}</strong></div></div>
         </div>
 
         <div class="card">
@@ -63,9 +63,9 @@
                                     <td>{{ $transaction->customer->name ?? 'N/A' }}</td>
                                     <td>{{ $transaction->reference_no }}</td>
                                     <td><span class="badge badge-{{ $transaction->type === 'buy' ? 'info' : 'danger' }}">{{ strtoupper($transaction->type) }}</span></td>
-                                    <td class="number">{{ number_format($openQuantity, 2) }}</td>
-                                    <td class="number">{{ number_format($transaction->current_rate, 2) }}</td>
-                                    <td class="number">{{ number_format($transaction->current_rate * $openQuantity * 13.7628, 2) }}</td>
+                                    <td class="number">{{ number_format($openQuantity, 3) }}</td>
+                                    <td class="number">{{ number_format($transaction->current_rate, 3) }}</td>
+                                    <td class="number">{{ number_format($transaction->current_rate * $openQuantity * 13.7639, 3) }}</td>
                                 </tr>
                             @empty
                                 <tr><td colspan="8" class="text-center text-muted">No running trades match these filters.</td></tr>

@@ -28,7 +28,7 @@
                                 <div class="col-sm-5 col-md-5 col-5">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h3>DEPOSIT <span class="pull-right"> {{ number_format(($supplier->init_balance +  $supplier->deposit_amount),2)   }} AED </span></h3>
+                                            <h3>DEPOSIT <span class="pull-right"> {{ number_format(($supplier->init_balance +  $supplier->deposit_amount),3)   }} AED </span></h3>
                                         </div>
                                         <div class="card-body">
                                             <h5 class="card-title">Deposit <span class="pull-right">2323 Gm</span></h5>
@@ -44,7 +44,7 @@
                                 <div class="col-sm-5 col-md-5 col-5">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h3>GOLD <span class="pull-right"> {{ number_format(($supplier->init_balance +  $supplier->deposit_amount),2)   }} AED </span></h3>
+                                            <h3>GOLD <span class="pull-right"> {{ number_format(($supplier->init_balance +  $supplier->deposit_amount),3)   }} AED </span></h3>
                                         </div>
                                         <div class="card-body">
                                         <h5 class="card-title">Unfix <span class="pull-right">2323 Gm</span></h5>
@@ -136,7 +136,7 @@
                                             <td style="border: 2px solid !important; text-align: center; font-size:15px;">{{ $row->data->purchase->note }}</td>
                                             <td style="border: 2px solid !important; text-align: center; font-size:15px;">{{ $row->data->type == "buy" ?"--":"--" }}</td>
                                             <td style="border: 2px solid !important; text-align: center; font-size:15px;">{{ $row->data->type != "buy" ? $row->data->unfix_subtotal : "--" }}</td>
-                                            <td style="border: 2px solid !important; text-align: center; font-size:17px;">{{ number_format(($deposit - $costing), 2) }}</td>
+                                            <td style="border: 2px solid !important; text-align: center; font-size:17px;">{{ number_format(($deposit - $costing), 3) }}</td>
                                             <td style="border: 2px solid !important; text-align: center; font-size:17px;">{{ $row->data->type == "buy" ? $row->data->pure_quantity : "--" }} </td>
                                             <td style="border: 2px solid !important; text-align: center; font-size:17px;">{{ $row->data->type != "buy" ? $row->data->pure_quantity : "--" }} </td>
 
@@ -156,7 +156,7 @@
                                             <td style="border: 2px solid !important; text-align: center; font-size:15px;">{{ $row->data->note }}</td>
                                             <td style="border: 2px solid !important; text-align: center; font-size:15px;">{{ $row->data->deposit_amount??"--" }} </td>
                                             <td style="border: 2px solid !important; text-align: center; font-size:15px;">{{ $row->data->withdraw_amount ?? "--" }}</td>
-                                            <td style="border: 2px solid !important; text-align: center; font-size:17px;">{{ number_format(($deposit - $costing), 2) }}</td>
+                                            <td style="border: 2px solid !important; text-align: center; font-size:17px;">{{ number_format(($deposit - $costing), 3) }}</td>
                                             <td style="border: 2px solid !important; text-align: center; font-size:17px;">--</td>
                                             <td style="border: 2px solid !important; text-align: center; font-size:17px;">--</td>
                                             <td style="border: 2px solid !important; text-align: center; font-size:17px;">{{ $gold_deposit - $gold_costing }} Gram</td>
@@ -172,9 +172,9 @@
                                     <tfoot>
                                         <tr>
                                             <td style="border: 2px solid !important; text-align: right; font-size:19px;" colspan="5">TOTAL</td>
-                                            <td style="border: 2px solid !important; text-align: center; font-size:15px;">{{ number_format(($deposit), 2) }}</td>
-                                            <td style="border: 2px solid !important; text-align: center; font-size:15px;">{{ number_format(($costing), 2) }}</td>
-                                            <td style="border: 2px solid !important; text-align: center; font-size:17px;">{{ number_format(($deposit - $costing), 2) }}</td>
+                                            <td style="border: 2px solid !important; text-align: center; font-size:15px;">{{ number_format(($deposit), 3) }}</td>
+                                            <td style="border: 2px solid !important; text-align: center; font-size:15px;">{{ number_format(($costing), 3) }}</td>
+                                            <td style="border: 2px solid !important; text-align: center; font-size:17px;">{{ number_format(($deposit - $costing), 3) }}</td>
                                             <td style="border: 2px solid !important; text-align: center; font-size:17px;">{{ $gold_deposit }} </td>
                                             <td style="border: 2px solid !important; text-align: center; font-size:17px;">{{ $gold_costing }} </td>
 

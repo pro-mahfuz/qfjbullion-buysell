@@ -192,14 +192,14 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="maxtt_per_K">Max TT Per Thousand</label>
+                                        <label for="maxtt_per_K">Max TT per 1000 AED</label>
                                         <input type="text" name="maxtt_per_K" class="form-control"
                                             value="{{ $customer->maxtt_per_K }}">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="service_charge">Service charge</label>
+                                        <label for="service_charge">Service charge ($)</label>
                                         <input name="service_charge" type="number" placeholder="Enter service charge"
                                             step="0.001" value="{{ $customer->service_charge }}" class="form-control">
                                         @error('service_charge')

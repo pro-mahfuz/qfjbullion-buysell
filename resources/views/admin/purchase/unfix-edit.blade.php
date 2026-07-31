@@ -169,7 +169,7 @@
             });
 
             // Update the element with id 'total' with the calculated sum
-            $('#unfix_total').val(sum.toFixed(2));
+            $('#unfix_total').val(sum.toFixed(3));
 
             const discount_aed = document.querySelectorAll('.discount_aed');
             discount_aed.forEach(function(element) {
@@ -179,7 +179,7 @@
                 }
             });
 
-            $('#discount').val(sum_d.toFixed(2));
+            $('#discount').val(sum_d.toFixed(3));
         }
 
         function calculateUnfix(id) {
@@ -187,11 +187,11 @@
             var pureQuantity = parseFloat($("input[name='items[" + id + "][quantity]']").val()) || 0;
             var discount_usd = parseFloat($("input[name='items[" + id + "][discount_usd]']").val()) || 0;
 
-            var ozValue = (((unfixValue + discount_usd) * 3.674) / 31.1035).toFixed(2);
-            var subtotalValue = (ozValue * pureQuantity).toFixed(2);
+            var ozValue = (((unfixValue + discount_usd) * 3.674) / 31.1035).toFixed(3);
+            var subtotalValue = (ozValue * pureQuantity).toFixed(3);
 
             $("input[name='items[" + id + "][discount_aed]']").val(((pureQuantity / 31.1035) * discount_usd * 3.674)
-                .toFixed(2));
+                .toFixed(3));
             $("input[name='items[" + id + "][unfix_subtotal]']").val(subtotalValue);
             $("input[name='items[" + id + "][unfix_rate_gram]']").val(ozValue);
 
@@ -260,7 +260,7 @@
                 priceDiv.textContent = `Gold Price: $${currentPrice}`;
                 // $(".fix_amount").val(currentPrice);
                 // const totalPriceAED = ((currentPrice / ouncesToGrams) * usdToAedRate) * $("#pure_quantity").val();
-                // $("#total_amount").val(totalPriceAED.toFixed(2));
+                // $("#total_amount").val(totalPriceAED.toFixed(3));
                 if (previousPrice !== null) {
                     if (currentPrice > previousPrice) {
                         priceDiv.style.backgroundColor = 'red';

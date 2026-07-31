@@ -74,7 +74,7 @@
                                                 </td>
                                                 <td>{{ $transaction['current_rate'] }}</td>
 
-                                                <td>{{ number_format($transaction['transaction_amount'], 2) }}</td>
+                                                <td>{{ number_format($transaction['transaction_amount'], 3) }}</td>
 
                                                 </td>
                                             </tr>

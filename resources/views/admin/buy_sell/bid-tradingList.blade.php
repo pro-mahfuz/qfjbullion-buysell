@@ -10,7 +10,7 @@
                     <th style="text-align:center;">DEPOSIT</th>
                     <th style="text-align:center;">WITHDRAW</th>
                     <th style="text-align:center;">EQUITY</th>
-                    <th style="text-align:center;">CUT POSITION</th>
+                    <th style="text-align:center;">MARGIN LIMIT</th>
                 </tr>
             </thead>
 
@@ -20,7 +20,7 @@
                     <td style="text-align:center; font-size:23px"> {{ $deposit }} </td>
                     <td style="text-align:center; font-size:23px"> {{ $withdraw }} </td>
                     <td style="text-align:center; font-size:23px"> <span id="equity">0.00</span> </td>
-                    <td style="text-align:center; font-size:23px"> <span id="cutposition">{{isset($runningBuySell) ? number_format($customer->cutposition, 2):0 }}</span> </td>
+                    <td style="text-align:center; font-size:23px"> <span id="cutposition">{{isset($runningBuySell) ? number_format($customer->cutposition, 3):0 }}</span> </td>
                 </tr>
 
             </tbody>
@@ -166,21 +166,21 @@
                                         <td>{{ $transaction->type }}</td>
                                         <td>{{ $transaction->tt_quantity - $transaction->close_quanntity }}</td>
                                         <td id="current_rate-{{ $sl }}">
-                                            {{ number_format($transaction->current_rate, 2) }}</td>
+                                            {{ number_format($transaction->current_rate, 3) }}</td>
 
                                         <td id="oldbalance-{{ $sl }}"
                                             style="text-align: center; display: none">
-                                            {{ number_format($transaction->current_rate * 13.7628 * ($transaction->tt_quantity - $transaction->close_quanntity), 2) }}
+                                            {{ number_format($transaction->current_rate * 13.7639 * ($transaction->tt_quantity - $transaction->close_quanntity), 3) }}
                                         </td>
                                         <td style="text-align: center; display: none"><span
                                                 data-id="{{ $sl }}" data-type="{{ $transaction->type }}"
                                                 data-qty="{{ $transaction->tt_quantity - $transaction->close_quanntity }}"
-                                                data-startrate="{{ number_format($transaction->current_rate * 13.7628 * ($transaction->tt_quantity - $transaction->close_quanntity), 2) }}"
-                                                class="ratelist">{{ number_format($transaction->current_rate, 2) }}<span>
+                                                data-startrate="{{ number_format($transaction->current_rate * 13.7639 * ($transaction->tt_quantity - $transaction->close_quanntity), 3) }}"
+                                                class="ratelist">{{ number_format($transaction->current_rate, 3) }}<span>
                                         </td>
 
                                         <td id="balance-{{ $sl }}" style="text-align: right;">
-                                            {{ number_format($transaction->current_rate, 2) }}
+                                            {{ number_format($transaction->current_rate, 3) }}
                                         </td>
                                         <td> {{ $transaction->take_profit }} </td>
                                         <td> {{ $transaction->stop_loss }} </td>
@@ -278,8 +278,8 @@
                                         <td>{{ $pen->created_at }}</td>
                                         <td>{{ $pen->type }}</td>
                                         <td>{{ $pen->tt }}</td>
-                                        <td>{{ number_format($pen->limit, 2) }}</td>
-                                        <td>{{ number_format($pen->stop, 2) }}</td>
+                                        <td>{{ number_format($pen->limit, 3) }}</td>
+                                        <td>{{ number_format($pen->stop, 3) }}</td>
                                         <td>{{ $pen->created_by }}</td>
                                         <td>
                                             <div class="d-flex ">
@@ -380,14 +380,14 @@
             
             let sellPrice = data.gold_sell_price - 0.53;
             let sellDiv = document.getElementById('sellrate');
-            sellDiv.textContent = `$${sellPrice.toFixed(2)}`;
+            sellDiv.textContent = `$${sellPrice.toFixed(3)}`;
             
             let buyPrice = parseFloat(sellPrice) + 1;
             buyPriceGlobal = parseFloat(sellPrice) + 1;
             let price = sellPrice;
 
             let priceDiv = document.getElementById('buyrate');
-            priceDiv.textContent = `$${buyPrice.toFixed(2)}`;
+            priceDiv.textContent = `$${buyPrice.toFixed(3)}`;
 
             
 
@@ -396,12 +396,12 @@
                 let qty = $(this).attr("data-qty");
                 let dataId = $(this).attr("data-id");
                 let dataType = $(this).attr("data-type");
-                let perQtyPrice = qty * 13.7628;
+                let perQtyPrice = qty * 13.7639;
 
                 // let runningValue = dataType == 'sell' ?   perQtyPrice * buyPrice : perQtyPrice * sellPrice;
                 let runningValue = perQtyPrice * price;
 
-                $(this).html(runningValue.toFixed(2));
+                $(this).html(runningValue.toFixed(3));
 
                 let oldBalance = parseFloat($("#oldbalance-" + dataId).text().replace(/,/g, ''));
 
@@ -416,7 +416,7 @@
 
                 sum = sum + newBalance;
 
-                $("#balance-" + dataId).html(newBalance.toFixed(2));
+                $("#balance-" + dataId).html(newBalance.toFixed(3));
                 try {
                     letPrfoitLoss = 0;
                     if (dataType == 'sell') {
@@ -427,7 +427,7 @@
 
                     let profit_lossDiv = document.getElementById("profit_loss-" + dataId);
                     if (profit_lossDiv != null) {
-                        profit_lossDiv.textContent = `After Charge: ${letPrfoitLoss.toFixed(2)}`;
+                        profit_lossDiv.textContent = `After Charge: ${letPrfoitLoss.toFixed(3)}`;
                     }
 
                 } catch (e) {
@@ -439,7 +439,7 @@
 
             let new_amount = amount + sum;
             let equityDiv = document.getElementById('equity');
-            equityDiv.textContent = `${new_amount.toFixed(2)}`;
+            equityDiv.textContent = `${new_amount.toFixed(3)}`;
             // console.log("maxtt_per_K " + maxtt_per_K);
 
             if (maxtt_per_K === null) {
@@ -454,7 +454,7 @@
 
 
             let availableTTB = document.getElementById('availableTTB');
-            availableTTB.textContent = `${(max).toFixed(2)}`;
+            availableTTB.textContent = `${(max).toFixed(3)}`;
             // const equityDiv = document.getElementById('equity');
             // equityDiv.textContent = `$${sellPrice}`;
 
@@ -509,7 +509,7 @@
             tt_quantity: document.getElementById('bid').value,
             current_rate: document.getElementById('gold_value').value,
             total_amount_aed: (document.getElementById('gold_value').value * 3.745 * 3.67 * document.getElementById(
-                'bid').value).toFixed(2),
+                'bid').value).toFixed(3),
             close_quanntity: 0,
             type: type,
             cut_position: 0,

@@ -71,10 +71,10 @@ trait ClientTrait
         $buy = $transactions->where('transaction_type', 'buy')->sum('transaction_amount');
         $sell = $transactions->where('transaction_type', 'sell')->sum('transaction_amount');
         return [
-            number_format($deposit, 2),
-            number_format($withdraw, 2),
-            number_format($buy, 2),
-            number_format($sell, 2)
+            number_format($deposit, 3),
+            number_format($withdraw, 3),
+            number_format($buy, 3),
+            number_format($sell, 3)
         ];
     }
 

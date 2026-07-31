@@ -75,10 +75,10 @@ class TransactionService
         $buy = $transactions->where('transaction_type', 'buy')->sum('transaction_amount');
         $sell = $transactions->where('transaction_type', 'sell')->sum('transaction_amount');
         return [
-            number_format($deposit, 2),
-            number_format($withdraw, 2),
-            number_format($buy, 2),
-            number_format($sell, 2)
+            number_format($deposit, 3),
+            number_format($withdraw, 3),
+            number_format($buy, 3),
+            number_format($sell, 3)
         ];
     }
 
@@ -264,7 +264,9 @@ class TransactionService
             ]
         )->setPaper('a4', 'landscape');
         // return $this->saveOnDisk($pdf, $invoice);
-        return $pdf->download('statement.pdf');
+        $statementFilename = (preg_replace('/[^A-Za-z0-9_-]+/', '_', $customer->customer_code ?: 'customer-' . $customer->id) ?: 'customer-' . $customer->id) . '.pdf';
+
+        return $pdf->download($statementFilename);
     }
 
     public function getProfitLoss($transactions, $id, $buyPrice, $startDate = null, $endDate = null): array
@@ -318,10 +320,10 @@ class TransactionService
             $withdraw,
             $profit,
             $loss,
-            number_format($openPositionProfitOrLoss, 2),
-            number_format($currentBalance, 2),
+            number_format($openPositionProfitOrLoss, 3),
+            number_format($currentBalance, 3),
             $running,
-            number_format($cutPositionCalulate, 2),
+            number_format($cutPositionCalulate, 3),
             $qtySum,
             $equity
         ];
@@ -501,7 +503,7 @@ class TransactionService
 
         return collect([
             'total_tt' => $runningData->total_tt ?? 0,
-            'avg' => $runningData->current_rate_avg ? number_format($runningData->current_rate_avg, 2) : 0,
+            'avg' => $runningData->current_rate_avg ? number_format($runningData->current_rate_avg, 3) : 0,
             'sum' => $runningData->total_tt * $runningData->current_rate_avg
         ]);
 
@@ -602,7 +604,7 @@ class TransactionService
 
         $equity = $currentBalance + $newBalanceAdjustment;
 
-        return $buyPrice - ($equity / (13.7628 * $qty));
+        return $buyPrice - ($equity / (13.7639 * $qty));
     }
 
 
@@ -637,7 +639,7 @@ class TransactionService
             'Total TTB' => $runningData->total_tt_trade ?? 0,
             'Total Buy' => $runningData->total_buy ?? 0,
             'Total Sell' => $runningData->total_sell ?? 0,
-            'AVG Profit' => $runningData->avg_profit ? number_format($runningData->avg_profit, 2) : 0,
+            'AVG Profit' => $runningData->avg_profit ? number_format($runningData->avg_profit, 3) : 0,
         ];
 
     }
@@ -842,19 +844,41 @@ class TransactionService
 
     public function getLastTenCompletedList($customerId)
     {
-        $trans = Transaction::where(['business_id' => session()->get(key: 'bussinessId')])
+        $trans = Transaction::query()
+            ->select([
+                'id', 'customer_id', 'reference_no', 'reference_row', 'quantity', 'current_rate',
+                'starting_rate', 'transaction_amount', 'transaction_type', 'created_at',
+            ])
+            ->where(['business_id' => session()->get(key: 'bussinessId')])
             ->whereIn('transaction_type', ['buy', 'sell'])
             ->where('customer_id', $customerId)
-            // ->with(relations: 'customer')
+            ->with('customer:id,name')
             ->orderBy('id', 'desc')
             ->limit(10)
             ->get();
 
-        return $trans->map(function ($transaction) {
-            $customer = Customer::find($transaction->customer_id);
-            $transaction->linked_buy = Buysell::where('id', $transaction->reference_row)->first();
-            $transaction->customer = $customer;
-            return $transaction;
+        $linkedTrades = Buysell::whereIn('id', $trans->pluck('reference_row')->filter()->unique())
+            ->get(['id', 'type', 'current_rate', 'created_at', 'service_charge', 'swap_charge', 'tt_quantity'])
+            ->keyBy('id');
+
+        return $trans->each(function ($transaction) use ($linkedTrades) {
+            $openingTrade = $linkedTrades->get($transaction->reference_row);
+            $quantity = is_numeric($transaction->quantity) ? (float) $transaction->quantity : 0;
+            $openingRate = is_numeric($transaction->starting_rate) ? (float) $transaction->starting_rate : (float) ($openingTrade->current_rate ?? 0);
+            $closingRate = is_numeric($transaction->current_rate) ? (float) $transaction->current_rate : 0;
+            $serviceCharge = round($quantity * ((float) ($openingTrade->service_charge ?? 0) * 13.7639), 3);
+            $openingQuantity = (float) ($openingTrade->tt_quantity ?? $quantity);
+            $swapCharge = round($openingQuantity > 0
+                ? ((float) ($openingTrade->swap_charge ?? 0) * ($quantity / $openingQuantity))
+                : (float) ($openingTrade->swap_charge ?? 0), 3);
+            $totalValue = round(($openingRate * 13.7639 * $quantity) + $serviceCharge + $swapCharge, 3);
+            $currentValue = round($closingRate * 13.7639 * $quantity, 3);
+            $openingType = $openingTrade->type ?? $transaction->transaction_type;
+
+            $transaction->setAttribute('linked_buy', $openingTrade);
+            $transaction->setAttribute('calculated_profit_loss', round(($openingType === 'buy'
+                ? $currentValue - $totalValue
+                : $totalValue - $currentValue), 3));
         });
     }
 

@@ -174,19 +174,19 @@
                                         <td>{{ $transaction['type'] }}</td>
                                         <td>{{ $transaction['tt_quantity'] - $transaction['close_quanntity'] }}</td>
                                         <td id="current_rate-{{ $sl }}">
-                                            {{ number_format($transaction['current_rate'], 2) }}</td>
+                                            {{ number_format($transaction['current_rate'], 3) }}</td>
 
                                         <td id="oldbalance-{{ $sl }}" style="text-align: center;">
-                                            {{ number_format($transaction['current_rate'] * $converted * ($transaction['tt_quantity'] - $transaction['close_quanntity']), 2) }}
+                                            {{ number_format($transaction['current_rate'] * $converted * ($transaction['tt_quantity'] - $transaction['close_quanntity']), 3) }}
                                         </td>
                                         <td style="text-align: center;"><span data-id="{{ $sl }}"
                                                 data-type="{{ $transaction['type'] }}"
                                                 data-qty="{{ $transaction['tt_quantity'] - $transaction['close_quanntity'] }}"
-                                                data-startrate="{{ number_format($transaction['current_rate'] * $converted * ($transaction['tt_quantity'] - $transaction['close_quanntity']), 2) }}"
-                                                class="ratelist">{{ number_format($transaction['current_rate'], 2) }}<span>
+                                                data-startrate="{{ number_format($transaction['current_rate'] * $converted * ($transaction['tt_quantity'] - $transaction['close_quanntity']), 3) }}"
+                                                class="ratelist">{{ number_format($transaction['current_rate'], 3) }}<span>
                                         </td>
                                         <td id="balance-{{ $sl }}" style="text-align: right;">
-                                            {{ number_format($transaction['current_rate'], 2) }}
+                                            {{ number_format($transaction['current_rate'], 3) }}
                                         </td>
                                         <td>
                                             <div class="d-flex">
@@ -285,7 +285,7 @@
 
                 let runningValue = dataType == 'sell' ? perQtyPrice * sellPrice : perQtyPrice * buyPrice;
 
-                $(this).html(runningValue.toFixed(2));
+                $(this).html(runningValue.toFixed(3));
 
                 let oldBalance = parseFloat($("#oldbalance-" + dataId).text().replace(/,/g, ''));
 
@@ -300,7 +300,7 @@
 
                 sum = sum + newBalance;
 
-                $("#balance-" + dataId).html(newBalance.toFixed(2));
+                $("#balance-" + dataId).html(newBalance.toFixed(3));
 
                 try {
                     letPrfoitLoss = 0;
@@ -315,10 +315,10 @@
 
                     // alert(letPrfoitLoss);
                     const profit_lossDiv = document.getElementById("profit_loss-" + dataId);
-                    profit_lossDiv.textContent = `After Charge: ${letPrfoitLoss.toFixed(2)}`;
+                    profit_lossDiv.textContent = `After Charge: ${letPrfoitLoss.toFixed(3)}`;
 
                     const current_rateDiv = document.getElementById("close_rate-" + dataId);
-                    current_rateDiv.value = `${buyPrice.toFixed(2)}`;
+                    current_rateDiv.value = `${buyPrice.toFixed(3)}`;
 
                 } catch (e) {
 
@@ -329,13 +329,13 @@
 
             let new_amount = amount + sum;
             const equityDiv = document.getElementById('equity');
-            equityDiv.textContent = `${new_amount.toFixed(2)}`;
+            equityDiv.textContent = `${new_amount.toFixed(3)}`;
             const cutpositionDiv = document.getElementById('cutposition');
             if (runningTTB == 0) {
                 cutpositionDiv.textContent = 0;
             } else {
                 cutpositionDiv.textContent =
-                    `${(buyPrice - ((new_amount.toFixed(2) / convertedRate / runningTTB ).toFixed(2))).toFixed(2)}`;
+                    `${(buyPrice - ((new_amount.toFixed(3) / convertedRate / runningTTB ).toFixed(3))).toFixed(3)}`;
             }
 
             if (maxtt_per_K === null) {
@@ -348,7 +348,7 @@
                 max = 0;
             }
             const availableTTB = document.getElementById('availableTTB');
-            availableTTB.textContent = `${(max).toFixed(2)}`;
+            availableTTB.textContent = `${(max).toFixed(3)}`;
 
         } catch (error) {
             console.error('Error fetching the gold price:', error);
@@ -374,7 +374,7 @@
             current_rate: document.getElementById('gold_value').value,
             total_amount_aed: (document.getElementById('gold_value').value * convertedRate * document
                 .getElementById(
-                    'qty').value).toFixed(2),
+                    'qty').value).toFixed(3),
             close_quanntity: 0,
             type: type,
             cut_position: 0,

@@ -50,7 +50,7 @@
                             <div class="col-md-6">
                                 <div class="p-3 rounded bg-light h-100">
                                     <small class="text-muted text-uppercase font-weight-bold">Total {{ $transactionLabel }} amount</small>
-                                    <div class="h3 mb-0 mt-1">AED {{ number_format((float) $amount, 2) }}</div>
+                                    <div class="h3 mb-0 mt-1">AED {{ number_format((float) $amount, 3) }}</div>
                                 </div>
                             </div>
                         </div>

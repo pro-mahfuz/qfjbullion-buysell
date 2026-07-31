@@ -38,11 +38,11 @@
                         <tr>
                             <td>{{ date('d/M/Y', strtotime($row->created_at)) }}</td>
                             <td style="text-align: right;">
-                                {{ $row->deposit_amount > 0 ? 'AED ' . number_format($row->deposit_amount, 2) : '--' }}
+                                {{ $row->deposit_amount > 0 ? 'AED ' . number_format($row->deposit_amount, 3) : '--' }}
                             </td>
 
                             <td style="text-align: right;">
-                                {{ $row->withdraw_amount > 0 ? 'AED ' . number_format($row->withdraw_amount, 2) : '--' }}
+                                {{ $row->withdraw_amount > 0 ? 'AED ' . number_format($row->withdraw_amount, 3) : '--' }}
                             </td>
 
                         </tr>

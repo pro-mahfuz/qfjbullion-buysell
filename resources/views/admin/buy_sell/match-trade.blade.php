@@ -37,7 +37,7 @@
                                     @endphp
                                     <tr>
                                         <td>Amount</td>
-                                        <td>{{ number_format($oldAmount, 2) }}
+                                        <td>{{ number_format($oldAmount, 3) }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -138,9 +138,9 @@
         document.getElementById('selectedTradeRate').value = selectedTradeRate;
         const profitLoss = document.getElementById('profitLoss');
         if (type === 'sell') {
-            profitLoss.textContent = (tradeAmount - transactionAmount).toFixed(2);
+            profitLoss.textContent = (tradeAmount - transactionAmount).toFixed(3);
         } else {
-            profitLoss.textContent = (transactionAmount - tradeAmount).toFixed(2);
+            profitLoss.textContent = (transactionAmount - tradeAmount).toFixed(3);
         }
 
     }

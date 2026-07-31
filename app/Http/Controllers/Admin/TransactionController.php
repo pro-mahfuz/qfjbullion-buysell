@@ -90,6 +90,9 @@ class TransactionController extends Controller
             return redirect()->back()->with('error', 'Invalid request');
         }
 
+        $customer = Customer::findOrFail($request->id);
+        $statementFilename = (preg_replace('/[^A-Za-z0-9_-]+/', '_', $customer->customer_code ?: 'customer-' . $customer->id) ?: 'customer-' . $customer->id) . '.pdf';
+
         $startDate = isset($request->start_date) ? $request->start_date . ' 00:00:00' : null;
         $endDate = isset($request->end_date) ? $request->end_date . ' 23:59:59' : null;
         $sellPrice = $request->goldValue;
@@ -116,16 +119,16 @@ class TransactionController extends Controller
             ', [$sellPrice, $sellPrice])->first();
         
         $data = [
-            'sum_of_deposit' => number_format($tran->sum_of_deposit, 2),
-            'sum_of_withdraw' => number_format($tran->sum_of_withdraw, 2),
-            'sum_of_sell_profit_loss' => number_format($tran->sum_of_sell_profit_loss, 2),
-            'sum_of_buy_profit_loss' => number_format($tran->sum_of_buy_profit_loss, 2),
+            'sum_of_deposit' => number_format($tran->sum_of_deposit, 3),
+            'sum_of_withdraw' => number_format($tran->sum_of_withdraw, 3),
+            'sum_of_sell_profit_loss' => number_format($tran->sum_of_sell_profit_loss, 3),
+            'sum_of_buy_profit_loss' => number_format($tran->sum_of_buy_profit_loss, 3),
             'sum_of_running_buy_ttb' => $buySell->sum_of_running_buy_ttb,
             'sum_of_running_sell_ttb' => $buySell->sum_of_running_sell_ttb,
             'sum_of_running_buy_profit' => $buySell->sum_of_running_buy_profit,
             'sum_of_running_sell_profit' => $buySell->sum_of_running_sell_profit,
-            'sum_of_running_running_profit_loss' => (($buySell->sum_of_running_buy_profit + $buySell->sum_of_running_sell_profit) * 13.7628),
-            'current_profit_loss' => number_format(($tran->sum_of_sell_profit_loss + $tran->sum_of_buy_profit_loss), 2),
+            'sum_of_running_running_profit_loss' => (($buySell->sum_of_running_buy_profit + $buySell->sum_of_running_sell_profit) * 13.7639),
+            'current_profit_loss' => number_format(($tran->sum_of_sell_profit_loss + $tran->sum_of_buy_profit_loss), 3),
             'current_balance' => $this->transactionService->getCurrentBalance($request->id),
             'equity' => $this->transactionService->getEquity($request->id, $sellPrice),
             'sum_of_running_service_charge' => $buySell->sum_of_running_service_charge,
@@ -189,7 +192,7 @@ class TransactionController extends Controller
         //     'value' => $value,
         //     'sumBuy' => $sumBuy,
         //     'sumSell' => $sumSell,
-        //     'totalProfitLoss' => number_format($totalProfitLoss, 2),
+        //     'totalProfitLoss' => number_format($totalProfitLoss, 3),
         //     'pending' => $pending,
         //     'data' => $data,
         //     'runningBuySell' => $runningBuySell,
@@ -215,17 +218,17 @@ class TransactionController extends Controller
                 'total_qty' => $totalQty,
                 'cut_position' => $cutPosition,
                 'equity' => $equity,
-                'customer' => $this->customerService->getCustomerById($request->id),
+                'customer' => $customer,
                 'value' => $value,
                 'sumBuy' => $sumBuy,
                 'sumSell' => $sumSell,
-                'totalProfitLoss' => number_format($totalProfitLoss, 2),
+                'totalProfitLoss' => number_format($totalProfitLoss, 3),
                 'pending' => $pending,
                 'data' => $data,
                 'runningBuySell' => $runningBuySell,
             ]
         )->setPaper('a4', 'landscape');
-        return $pdf->download('statement.pdf');
+        return $pdf->download($statementFilename);
 
         // $validator = Validator::make($request->all(), [
         //     'id' => 'required',
@@ -320,16 +323,16 @@ class TransactionController extends Controller
             ', [$sellPrice, $sellPrice])->first();
         
         $data = [
-            'sum_of_deposit' => number_format($tran->sum_of_deposit, 2),
-            'sum_of_withdraw' => number_format($tran->sum_of_withdraw, 2),
-            'sum_of_sell_profit_loss' => number_format($tran->sum_of_sell_profit_loss, 2),
-            'sum_of_buy_profit_loss' => number_format($tran->sum_of_buy_profit_loss, 2),
+            'sum_of_deposit' => number_format($tran->sum_of_deposit, 3),
+            'sum_of_withdraw' => number_format($tran->sum_of_withdraw, 3),
+            'sum_of_sell_profit_loss' => number_format($tran->sum_of_sell_profit_loss, 3),
+            'sum_of_buy_profit_loss' => number_format($tran->sum_of_buy_profit_loss, 3),
             'sum_of_running_buy_ttb' => $buySell->sum_of_running_buy_ttb,
             'sum_of_running_sell_ttb' => $buySell->sum_of_running_sell_ttb,
             'sum_of_running_buy_profit' => $buySell->sum_of_running_buy_profit,
             'sum_of_running_sell_profit' => $buySell->sum_of_running_sell_profit,
-            'sum_of_running_running_profit_loss' => (($buySell->sum_of_running_buy_profit + $buySell->sum_of_running_sell_profit) * 13.7628),
-            'current_profit_loss' => number_format(($tran->sum_of_sell_profit_loss + $tran->sum_of_buy_profit_loss), 2),
+            'sum_of_running_running_profit_loss' => (($buySell->sum_of_running_buy_profit + $buySell->sum_of_running_sell_profit) * 13.7639),
+            'current_profit_loss' => number_format(($tran->sum_of_sell_profit_loss + $tran->sum_of_buy_profit_loss), 3),
             'current_balance' => $this->transactionService->getCurrentBalance($request->id),
             'equity' => $this->transactionService->getEquity($request->id, $sellPrice),
             'sum_of_running_service_charge' => $buySell->sum_of_running_service_charge,
@@ -392,7 +395,7 @@ class TransactionController extends Controller
             'value' => $value,
             'sumBuy' => $sumBuy,
             'sumSell' => $sumSell,
-            'totalProfitLoss' => number_format($totalProfitLoss, 2),
+            'totalProfitLoss' => number_format($totalProfitLoss, 3),
             'pending' => $pending,
             'data' => $data,
             'runningBuySell' => $runningBuySell,

@@ -20,7 +20,7 @@ trait GolbalHelperTrait
         $type = $sumBuy > $sumSell ? 'buy' : 'sell';
 
         if ($totalQty != 0) {
-            $cutPosition = $equity / 13.7628 / $totalQty;
+            $cutPosition = $equity / 13.7639 / $totalQty;
         } else {
             $cutPosition = 0;
         }
@@ -31,7 +31,7 @@ trait GolbalHelperTrait
             $cutPositionCalulate = $type == 'buy' ? $currentRate - $cutPosition : $currentRate + $cutPosition;
         }
 
-        $cut = abs(number_format((float)$cutPositionCalulate, 2, '.', ''));
+        $cut = abs(number_format((float)$cutPositionCalulate, 3, '.', ''));
 
  
          DB::table('customers')->where('id', $customerId)

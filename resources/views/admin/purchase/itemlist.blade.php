@@ -76,7 +76,7 @@
              }
          });
 
-         $('#unfix_total').val(sum.toFixed(2));
+         $('#unfix_total').val(sum.toFixed(3));
      }
 
 
@@ -85,10 +85,10 @@
          var pureQuantity = parseFloat($("#pure_quantity_" + id).val()) || 0;
          var discount_usd = parseFloat($("#discount_usd_" + id).val()) || 0;
 
-         var ozValue = (((unfixValue - discount_usd) * 3.674) / 31.1035).toFixed(2);
-         var subtotalValue = (ozValue * pureQuantity).toFixed(2);
+         var ozValue = (((unfixValue - discount_usd) * 3.674) / 31.1035).toFixed(3);
+         var subtotalValue = (ozValue * pureQuantity).toFixed(3);
 
-         $("#discount_aed_" + id).val(((pureQuantity / 31.1035) * discount_usd * 3.674).toFixed(2));
+         $("#discount_aed_" + id).val(((pureQuantity / 31.1035) * discount_usd * 3.674).toFixed(3));
          $("#unfix_oz_" + id).val(ozValue);
          $("#unfix_subtotal_" + id).val(subtotalValue);
 

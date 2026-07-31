@@ -76,7 +76,7 @@
                                             <td style="text-align: right;">{{ $row->deposit_amount }}</td>
                                             <td style="text-align: right;">{{ $row->sell_amount }}</td>
                                             <td style="text-align: right;"><b>
-                                                    {{ number_format($row->init_balance + $row->deposit_amount - $row->sell_amount, 2) }}
+                                                    {{ number_format($row->init_balance + $row->deposit_amount - $row->sell_amount, 3) }}
                                                 </b></td>
 
                                             @can('supplier_edit')

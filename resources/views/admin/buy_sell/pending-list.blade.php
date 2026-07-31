@@ -21,8 +21,8 @@
                 <td>{{ $transaction->created_at }}</td>
                 <td>{{ $transaction->type }}</td>
                 <td>{{ $transaction->tt_quantity }}</td>
-                <td>{{ number_format($transaction->threshold_rate, 2) }}</td>
-                <td>{{ number_format($transaction->stop_limit, 2) }}</td>
+                <td>{{ number_format($transaction->threshold_rate, 3) }}</td>
+                <td>{{ number_format($transaction->stop_limit, 3) }}</td>
 
 
                 {{-- <td> <a href="#"

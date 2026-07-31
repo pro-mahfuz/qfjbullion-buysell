@@ -61,7 +61,7 @@
                 @foreach ($transactions as $transaction)
                     <tr>
                         <td>{{ $i++ }}</td>
-                        <td>{{ number_format($transaction->transaction_amount, 2) }}</td>
+                        <td>{{ number_format($transaction->transaction_amount, 3) }}</td>
                         <td>{{ date('Y-m-d', strtotime($transaction->transaction_date)) }}</td>
                         <td>{{ $transaction->tnx_id }}</td>
                     </tr>

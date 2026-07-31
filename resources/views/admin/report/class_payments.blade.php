@@ -54,9 +54,9 @@
                 @if($isSearchAble)
                 <div class="row">
                 <div class="col-md-3"><h4>Toatal Student: {{ $total_paid_student }}</h4></div>
-                <div class="col-md-3"><h4>Toatal amount: {{ number_format($total_amount, 2) }}</h4></div>
-                    <div class="col-md-3"><h4>Toatal Paid: {{ number_format($total_paid, 2) }}</h4></div>
-                    <div class="col-md-3"><h4>Toatal Due: {{ number_format(($total_amount - $total_paid), 2) }}</h4></div>
+                <div class="col-md-3"><h4>Toatal amount: {{ number_format($total_amount, 3) }}</h4></div>
+                    <div class="col-md-3"><h4>Toatal Paid: {{ number_format($total_paid, 3) }}</h4></div>
+                    <div class="col-md-3"><h4>Toatal Due: {{ number_format(($total_amount - $total_paid), 3) }}</h4></div>
                 </div>
                 @endif
 

@@ -42,7 +42,7 @@
             <div class="card-body">
                 <div class="row mb-4">
                     <div class="col-md-3 mb-2 mb-md-0"><div class="transaction-stat"><small>Filtered transactions</small><strong>{{ $transactions->total() }}</strong></div></div>
-                    <div class="col-md-4"><div class="transaction-stat"><small>Filtered {{ $isDeposit ? 'deposits' : 'withdrawals' }}</small><strong>AED {{ number_format($totalAmount, 2) }}</strong></div></div>
+                    <div class="col-md-4"><div class="transaction-stat"><small>Filtered {{ $isDeposit ? 'deposits' : 'withdrawals' }}</small><strong>AED {{ number_format($totalAmount, 3) }}</strong></div></div>
                 </div>
                 <form method="GET" action="{{ $clearRoute }}" class="mb-4">
                     <div class="form-row align-items-end">
@@ -92,7 +92,7 @@
                                         <span class="reference">{{ $transaction->reference_no ?? 'No reference' }}</span>
                                         <span class="note" title="{{ $transaction->note }}">{{ $transaction->note ?? '—' }}</span>
                                     </td>
-                                    <td class="text-right amount">{{ number_format($transaction->transaction_amount, 2) }}</td>
+                                    <td class="text-right amount">{{ number_format($transaction->transaction_amount, 3) }}</td>
                                     <td>{{ $transaction->created_by ?? '—' }}</td>
                                 </tr>
                             @empty

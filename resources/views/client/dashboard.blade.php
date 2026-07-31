@@ -38,9 +38,9 @@
                                 </div>
                                 <div class="card-footer d-flex justify-content-between">
                                     <p class="text-muted mb-0">Approved :
-                                        {{ number_format($totalDepositApproved, 2) }}
+                                        {{ number_format($totalDepositApproved, 3) }}
                                     </p>
-                                    <p class="text-muted mb-0">Amount : {{ number_format($totalDepositInCompletedAvg, 2) }}
+                                    <p class="text-muted mb-0">Amount : {{ number_format($totalDepositInCompletedAvg, 3) }}
                                     </p>
                                 </div>
                             </div>
@@ -53,15 +53,15 @@
                                     <i class="fas fa-dollar-sign fa-2x text-info mb-3"></i>
                                     <h5 class="card-title text-muted">Total WithDraw</h5>
                                     <h3 class="card-text font-weight-bold">
-                                        {{ number_format($totalWithDrawInCompleted, 2) }}
+                                        {{ number_format($totalWithDrawInCompleted, 3) }}
                                     </h3>
                                 </div>
                                 <div class="card-footer d-flex justify-content-between">
                                     <p class="text-muted mb-0">Approved :
-                                        {{ number_format($totalWithDrawApproved, 2) }}
+                                        {{ number_format($totalWithDrawApproved, 3) }}
                                     </p>
                                     <p class="text-muted mb-0">Amount :
-                                        {{ number_format($totalWithDrawInCompletedAvg, 2) }}</p>
+                                        {{ number_format($totalWithDrawInCompletedAvg, 3) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -72,15 +72,15 @@
                                     <i class="fas fa-dollar-sign fa-2x text-info mb-3"></i>
                                     <h5 class="card-title text-muted">Total Transactions</h5>
                                     <h3 class="card-text font-weight-bold">
-                                        {{ number_format($totalTransactions, 2) }}
+                                        {{ number_format($totalTransactions, 3) }}
                                     </h3>
                                 </div>
                                 <div class="card-footer d-flex justify-content-between">
                                     <p class="text-muted mb-0">profit :
-                                        {{ number_format($profit, 2) }}
+                                        {{ number_format($profit, 3) }}
                                     </p>
                                     <p class="text-muted mb-0">loss :
-                                        {{ number_format($loss, 2) }}</p>
+                                        {{ number_format($loss, 3) }}</p>
                                 </div>
                             </div>
                         </div>

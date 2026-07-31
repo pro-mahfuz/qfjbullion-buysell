@@ -64,7 +64,7 @@ class CustomerService
             $margin = 0;
         
             if ($active_ttb != 0) {
-                $margin_gap = ($equity / abs($active_ttb)) / 13.7628;
+                $margin_gap = ($equity / abs($active_ttb)) / 13.7639;
                 $margin = $active_ttb > 0
                     ? $marketPrice - $margin_gap
                     : $margin_gap + $marketPrice;
@@ -85,20 +85,20 @@ class CustomerService
                 return $customer;
             }
         
-            $customer->sum_of_deposit = number_format($tran->sum_of_deposit, 2);
-            $customer->sum_of_withdraw = number_format($tran->sum_of_withdraw, 2);
-            $customer->sum_of_sell_profit_loss = number_format($tran->sum_of_sell_profit_loss, 2);
-            $customer->sum_of_buy_profit_loss = number_format($tran->sum_of_buy_profit_loss, 2);
+            $customer->sum_of_deposit = number_format($tran->sum_of_deposit, 3);
+            $customer->sum_of_withdraw = number_format($tran->sum_of_withdraw, 3);
+            $customer->sum_of_sell_profit_loss = number_format($tran->sum_of_sell_profit_loss, 3);
+            $customer->sum_of_buy_profit_loss = number_format($tran->sum_of_buy_profit_loss, 3);
             $customer->sum_of_running_buy_ttb = $sum_of_buy_ttb;
             $customer->sum_of_running_sell_ttb = $sum_of_sell_ttb;
             $customer->sum_of_running_buy_profit = $buySell->sum_of_running_buy_profit;
             $customer->sum_of_running_sell_profit = $buySell->sum_of_running_sell_profit;
-            $customer->current_profit_loss = number_format(($tran->sum_of_sell_profit_loss + $tran->sum_of_buy_profit_loss), 2);
+            $customer->current_profit_loss = number_format(($tran->sum_of_sell_profit_loss + $tran->sum_of_buy_profit_loss), 3);
             $customer->current_balance = app('App\Services\TransactionService')->getCurrentBalance($customer->id);
             $customer->equity = $equity;
             $customer->margin_gap = $margin_gap;
             $customer->margin = $margin;
-            $customer->sum_of_running_service_charge = $buySell->sum_of_running_service_charge * 13.7628;
+            $customer->sum_of_running_service_charge = $buySell->sum_of_running_service_charge * 13.7639;
         
             return $customer;
         });

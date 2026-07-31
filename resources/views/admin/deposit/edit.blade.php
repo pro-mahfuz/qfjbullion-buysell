@@ -50,10 +50,10 @@
                                                 <tr>
                                                     <td>{{ date('d/M/Y', strtotime($row->created_at)) }}</td>
                                                     <td style="text-align: right;">
-                                                        {{ $row->deposit_amount > 0 ? 'AED ' . number_format($row->deposit_amount, 2) : '--' }}
+                                                        {{ $row->deposit_amount > 0 ? 'AED ' . number_format($row->deposit_amount, 3) : '--' }}
                                                     </td>
                                                     <td style="text-align: right;">
-                                                        {{ $row->withdraw_amount > 0 ? 'AED ' . number_format($row->withdraw_amount, 2) : '--' }}
+                                                        {{ $row->withdraw_amount > 0 ? 'AED ' . number_format($row->withdraw_amount, 3) : '--' }}
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -129,12 +129,12 @@
             });
 
             $('#quantity').on('input', function() {
-                $("#pure_quantity").val(($('#quantity').val() * $('#pure_rate').val()).toFixed(2));
-                $("#total_amount").val(($('#pure_quantity').val() * $('#fix_amount').val()).toFixed(2));
+                $("#pure_quantity").val(($('#quantity').val() * $('#pure_rate').val()).toFixed(3));
+                $("#total_amount").val(($('#pure_quantity').val() * $('#fix_amount').val()).toFixed(3));
             });
 
             $('#fix_amount').on('change', function() {
-                $("#total_amount").val(($('#quantity').val() * $(this).val()).toFixed(2));
+                $("#total_amount").val(($('#quantity').val() * $(this).val()).toFixed(3));
             });
 
             $('#product_id').on('change', function() {
@@ -151,7 +151,7 @@
                 const selectedOption = selectElement.options[selectElement.selectedIndex];
                 const purity = selectedOption.getAttribute('data-purity');
                 $('#pure_rate').val(purity);
-                $("#pure_quantity").val(($('#quantity').val() * $('#pure_rate').val()).toFixed(2));
+                $("#pure_quantity").val(($('#quantity').val() * $('#pure_rate').val()).toFixed(3));
             });
 
         });
@@ -186,7 +186,7 @@
                 $(".fix_amount").val(currentPrice);
                 const totalPriceAED = (($("#fix_amount").val() / ouncesToGrams) * usdToAedRate) * $("#pure_quantity")
                     .val();
-                $("#total_amount").val(totalPriceAED.toFixed(2));
+                $("#total_amount").val(totalPriceAED.toFixed(3));
 
                 if (previousPrice !== null) {
                     if (currentPrice > previousPrice) {

@@ -189,7 +189,7 @@
                                                                     
                                                                 <td
                                                                     style="border: 2px solid !important; text-align: center; font-size:12px;padding:2px 5px;">
-                                                                    {{ number_format($deposit - $costing, 2) }}</td>
+                                                                    {{ number_format($deposit - $costing, 3) }}</td>
                                                                 <td
                                                                     style="border: 2px solid !important; text-align: center; font-size:12px;padding:2px 5px;">
                                                                     {{ $row->data->type == 'buy' ? $row->data->pure_quantity : '--' }}
@@ -236,7 +236,7 @@
                                                              
                                                                 <td
                                                                     style="border: 2px solid !important; text-align: center; font-size:12px;padding:2px 5px;">
-                                                                    {{ number_format($deposit - $costing, 2) }}</td>
+                                                                    {{ number_format($deposit - $costing, 3) }}</td>
                                                                 <td
                                                                     style="border: 2px solid !important; text-align: center; font-size:12px;padding:2px 5px;">
                                                                     --</td>
@@ -257,13 +257,13 @@
                                                         colspan="5">TOTAL</td>
                                                     <td
                                                         style="border: 2px solid !important; text-align: center; font-size:12px;padding:2px 5px;">
-                                                        {{ number_format($costing, 2) }}</td>
+                                                        {{ number_format($costing, 3) }}</td>
                                                         <td
                                                         style="border: 2px solid !important; text-align: center; font-size:12px;padding:2px 5px;">
-                                                        {{ number_format($deposit, 2) }}</td>
+                                                        {{ number_format($deposit, 3) }}</td>
                                                      <td
                                                         style="border: 2px solid !important; text-align: center; font-size:12px;padding:2px 5px;">
-                                                        {{ number_format($deposit - $costing, 2) }}</td>
+                                                        {{ number_format($deposit - $costing, 3) }}</td>
                                                     <td
                                                         style="border: 2px solid !important; text-align: center; font-size:12px;padding:2px 5px;">
                                                         {{ $gold_deposit }} </td>

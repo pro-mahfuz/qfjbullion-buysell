@@ -45,7 +45,7 @@
                                             <td>{{ $row->ref_no }}</td>
                                             <td>{{ $row->supplier->full_name }}</td>
                                             <td>{{ $row->note }}</td>
-                                            <td>{{ number_format($row->deposit_amount, 2) }} AED</td>
+                                            <td>{{ number_format($row->deposit_amount, 3) }} AED</td>
                                             <td>
                                                 <a href="{{ route('admin.supplier.deposit.edit', $row->id) }}"
                                                     class="btn btn-info btn-sm"><i class="fa fa-edit"></i></a>

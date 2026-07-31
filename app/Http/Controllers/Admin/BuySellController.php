@@ -38,7 +38,7 @@ class BuySellController extends Controller
     {
         //dd($request);
         $customer = null;
-        $lastTen = [];
+        $lastTen = collect();
         $deposit = null;
         $withdraw = null;
         $runningBuySell = [];
@@ -75,7 +75,7 @@ class BuySellController extends Controller
             'withdraw' => $withdraw,
             'buy' => $buy,
             'sell' => $sell,
-            'current_amount' => number_format($current_amount, 2),
+            'current_amount' => number_format($current_amount, 3),
             'runningBuySell' => $runningBuySell,
             'pending' => $pending,
             'lastTen' => $lastTen,
@@ -119,15 +119,15 @@ class BuySellController extends Controller
                 ', [$request->sellPrice, $request->sellPrice])->first();
             
             $data = [
-                'sum_of_deposit' => number_format($tran->sum_of_deposit, 2),
-                'sum_of_withdraw' => number_format($tran->sum_of_withdraw, 2),
-                'sum_of_sell_profit_loss' => number_format($tran->sum_of_sell_profit_loss, 2),
-                'sum_of_buy_profit_loss' => number_format($tran->sum_of_buy_profit_loss, 2),
+                'sum_of_deposit' => number_format($tran->sum_of_deposit, 3),
+                'sum_of_withdraw' => number_format($tran->sum_of_withdraw, 3),
+                'sum_of_sell_profit_loss' => number_format($tran->sum_of_sell_profit_loss, 3),
+                'sum_of_buy_profit_loss' => number_format($tran->sum_of_buy_profit_loss, 3),
                 'sum_of_running_buy_ttb' => $buySell->sum_of_running_buy_ttb,
                 'sum_of_running_sell_ttb' => $buySell->sum_of_running_sell_ttb,
                 'sum_of_running_buy_profit' => $buySell->sum_of_running_buy_profit,
                 'sum_of_running_sell_profit' => $buySell->sum_of_running_sell_profit,
-                'current_profit_loss' => number_format(($tran->sum_of_sell_profit_loss + $tran->sum_of_buy_profit_loss), 2),
+                'current_profit_loss' => number_format(($tran->sum_of_sell_profit_loss + $tran->sum_of_buy_profit_loss), 3),
                 'current_balance' => $this->transactionService->getCurrentBalance($request->customer_id),
                 'equity' => $this->transactionService->getEquity($request->customer_id, $request->sellPrice),
                 'sum_of_running_service_charge' => $buySell->sum_of_running_service_charge,
@@ -142,7 +142,7 @@ class BuySellController extends Controller
     public function buySellBox(Request $request)
     {
         $customer = null;
-        $lastTen = [];
+        $lastTen = collect();
         $deposit = null;
         $withdraw = null;
         $runningBuySell = [];
@@ -177,7 +177,7 @@ class BuySellController extends Controller
             'withdraw' => $withdraw,
             'buy' => $buy,
             'sell' => $sell,
-            'current_amount' => number_format($current_amount, 2),
+            'current_amount' => number_format($current_amount, 3),
             'runningBuySell' => $runningBuySell,
             'pending' => $pending,
             'lastTen' => $lastTen,
@@ -230,7 +230,16 @@ class BuySellController extends Controller
         // }
 
 
+        $validated = $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'tt_quantity' => 'required|numeric|gt:0',
+            'current_rate' => 'required|numeric|gt:0',
+            'type' => 'required|in:buy,sell',
+            'reference_no' => 'nullable|string|max:255',
+        ]);
+
         $postData = $request->except('_token');
+        $postData['tt_quantity'] = (float) $validated['tt_quantity'];
 
         try {
             // dd($postData);
@@ -486,6 +495,14 @@ class BuySellController extends Controller
 
     public function storePending(Request $request)
     {
+        $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'tt' => 'required|numeric|gt:0',
+            'type' => 'required|in:buy,sell',
+            'limit_' => 'nullable|numeric',
+            'stop_' => 'nullable|numeric',
+        ]);
+
         $limit = $request->limit_;
         $stop_limit = $request->stop_;
         // dd($limit, $stop_limit);
@@ -627,6 +644,14 @@ class BuySellController extends Controller
 
     public function storePrice(Request $request)
     {
+        $request->validate([
+            'transactionId' => 'required|exists:buysells,id',
+            'rate' => 'required|numeric',
+            'tt' => 'required|numeric|gt:0',
+            'type' => 'required|in:buy,sell',
+            'swap_charge' => 'required|numeric',
+        ]);
+
         $transactionId = $request->transactionId;
         $rate = $request->rate;
         $buySell = Buysell::find($transactionId);
@@ -638,6 +663,7 @@ class BuySellController extends Controller
         $buySell->type = $type;
         $buySell->take_profit = $request->take_profit;
         $buySell->stop_loss = $request->stop_loss;
+        $buySell->swap_charge = (float) $request->swap_charge;
 
         $buySell->tt_quantity = $tt;
         $buySell->created_at = $request->created_at;
@@ -651,6 +677,26 @@ class BuySellController extends Controller
             ->orderBy('id', 'desc')->get();
         $this->cutPosition($running, $price, $newEquity, $customer_id);
 
+        if ($request->expectsJson()) {
+            $outstandingQuantity = $buySell->tt_quantity - $buySell->close_quanntity;
+            $serviceCharge = $outstandingQuantity * ($buySell->service_charge * 13.7639);
+            $totalValue = ($buySell->current_rate * 13.7639 * $outstandingQuantity) + $serviceCharge + $buySell->swap_charge;
+
+            return response()->json([
+                'success' => true,
+                'trade' => [
+                    'created_at' => $buySell->created_at->format('Y-m-d H:i'),
+                    'type' => $buySell->type,
+                    'quantity' => number_format($outstandingQuantity, 3, '.', ''),
+                    'open_rate' => number_format($buySell->current_rate, 3, '.', ''),
+                    'total_value' => number_format($totalValue, 3, '.', ''),
+                    'service_charge' => number_format($serviceCharge, 3, '.', ''),
+                    'swap_charge' => number_format($buySell->swap_charge, 3, '.', ''),
+                    'take_profit' => $buySell->take_profit ?? 0,
+                    'stop_loss' => $buySell->stop_loss ?? 0,
+                ],
+            ]);
+        }
 
 
 

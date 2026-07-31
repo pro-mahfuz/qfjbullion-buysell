@@ -39,7 +39,7 @@
                         <th style="text-align:center;">WITHDRAW</th>
                     @endif
                     <th style="text-align:center;">EQUITY</th>
-                    <th style="text-align:center;">CUT POSITION</th>
+                    <th style="text-align:center;">MARGIN LIMIT</th>
                 </tr>
             </thead>
 
@@ -50,7 +50,7 @@
                      </td>
                     <td style="text-align:center; font-size:23px"> {{ $withdraw }} </td>
                     <td style="text-align:center; font-size:23px"> <span id="equity">0.00</span> </td>
-                    <td style="text-align:center; font-size:23px"> <span id="cutposition">{{isset($runningBuySell) ? number_format($customer->cutposition, 2):0 }}</span> </td>
+                    <td style="text-align:center; font-size:23px"> <span id="cutposition">{{isset($runningBuySell) ? number_format($customer->cutposition, 3):0 }}</span> </td>
                 </tr>
 
             </tbody>
@@ -111,6 +111,7 @@
                                 <th scope="col">Open Rate</th>
                                 <th scope="col">Total Value (AED)</th>
                                 <th scope="col">Service Charge (AED)</th>
+                                <th scope="col">Swap Charge (AED)</th>
                                 <th scope="col">Current Value (AED)</th>
                                 <th scope="col">Profit/Loss (AED)</th>
                                 <th scope="col">TP</th>
@@ -136,17 +137,26 @@
                                         <td style="text-align: center;">{{ $transaction->created_at }}</td>
                                         <td style="text-align: center;">{{ $transaction->type }}</td>
                                         <td style="text-align: center;">{{ $transaction->tt_quantity - $transaction->close_quanntity }}</td>
-                                        <td style="text-align: center;" id="current_rate-{{ $sl }}">{{ number_format($transaction->current_rate, 2) }}</td>
+                                        <td style="text-align: center;" id="current_rate-{{ $sl }}">{{ number_format($transaction->current_rate, 3) }}</td>
                                         <td style="text-align: center;" id="oldbalance-{{ $sl }}" style="text-align: center;">
-                                            {{ number_format($transaction->current_rate * 13.7628 * ($transaction->tt_quantity - $transaction->close_quanntity), 2) }}
+                                            {{ number_format(
+                                                ($transaction->current_rate * 13.7639 * ($transaction->tt_quantity - $transaction->close_quanntity))
+                                                + (($transaction->tt_quantity - $transaction->close_quanntity) * ($transaction->service_charge * 13.7639))
+                                                + ($transaction->swap_charge ?? 0),
+                                                3
+                                            ) }}
                                         </td>
                                         
                                         <td id="service_charge-{{ $sl }}" style="text-align: center;">
-                                            {{ number_format(($transaction->tt_quantity - $transaction->close_quanntity) * ($transaction->service_charge * 13.7628), 2) }}</td>
+                                            {{ number_format(($transaction->tt_quantity - $transaction->close_quanntity) * ($transaction->service_charge * 13.7639), 3) }}</td>
+
+                                        <td style="text-align: center;">
+                                            {{ number_format($transaction->swap_charge ?? 0, 3) }}
+                                        </td>
 
                                         
                                         <td style="text-align: center;">
-                                            <span data-id="{{ $sl }}" data-type="{{ $transaction->type }}" data-qty="{{ $transaction->tt_quantity - $transaction->close_quanntity }}" data-startrate="{{ number_format($transaction->current_rate * 13.7628 * ($transaction->tt_quantity - $transaction->close_quanntity), 2) }}" class="ratelist">
+                                            <span data-id="{{ $sl }}" data-type="{{ $transaction->type }}" data-qty="{{ $transaction->tt_quantity - $transaction->close_quanntity }}" data-startrate="{{ number_format(($transaction->current_rate * 13.7639 * ($transaction->tt_quantity - $transaction->close_quanntity)) + (($transaction->tt_quantity - $transaction->close_quanntity) * ($transaction->service_charge * 13.7639)) + ($transaction->swap_charge ?? 0), 3) }}" class="ratelist">
                                             <span>
                                         </td>
 
@@ -262,8 +272,8 @@
                                         <td>{{ $pen->created_at }}</td>
                                         <td>{{ $pen->type }}</td>
                                         <td>{{ $pen->tt }}</td>
-                                        <td>{{ number_format($pen->limit, 2) }}</td>
-                                        <td>{{ number_format($pen->stop, 2) }}</td>
+                                        <td>{{ number_format($pen->limit, 3) }}</td>
+                                        <td>{{ number_format($pen->stop, 3) }}</td>
                                         <td>{{ $pen->created_by }}</td>
                                         <td>
                                             <div class="d-flex ">
@@ -366,29 +376,28 @@
             
             let sellPrice = data.value - 0.53;
             let sellDiv = document.getElementById('sellrate');
-            sellDiv.textContent = `$${sellPrice.toFixed(2)}`;
+            sellDiv.textContent = `$${sellPrice.toFixed(3)}`;
             
             let buyPrice = parseFloat(sellPrice) + 1;
             buyPriceGlobal = sellPrice;
             let price = sellPrice;
 
             let priceDiv = document.getElementById('buyrate');
-            priceDiv.textContent = `$${buyPrice.toFixed(2)}`;
+            priceDiv.textContent = `$${buyPrice.toFixed(3)}`;
 
             
 
             let sum = 0;
-            let totalCharge = 0;
             $('.ratelist').each(function(index) {
                 let qty = $(this).attr("data-qty");
                 let dataId = $(this).attr("data-id");
                 let dataType = $(this).attr("data-type");
-                let perQtyPrice = qty * 13.7628;
+                let perQtyPrice = qty * 13.7639;
 
                 // let runningValue = dataType == 'sell' ?   perQtyPrice * buyPrice : perQtyPrice * sellPrice;
                 let runningValue = perQtyPrice * price;
 
-                $(this).html(runningValue.toFixed(2));
+                $(this).html(runningValue.toFixed(3));
 
                 let oldBalance = parseFloat($("#oldbalance-" + dataId).text().replace(/,/g, ''));
                 
@@ -404,22 +413,19 @@
 
                 sum = sum + newBalance;
                 
-                let serviceCharge = parseFloat($("#service_charge-" + dataId).text().replace(/,/g, ''));
-                totalCharge = totalCharge + serviceCharge;
-
-                $("#balance-" + dataId).html((newBalance - serviceCharge).toFixed(2));
+                $("#balance-" + dataId).html(newBalance.toFixed(3));
                 
                 // try {
                 //     letPrfoitLoss = 0;
                 //     if (dataType == 'sell') {
-                //         letPrfoitLoss = ((current_rate - price) - (serviceCharge * 13.7628)) * perQtyPrice;
+                //         letPrfoitLoss = ((current_rate - price) - (serviceCharge * 13.7639)) * perQtyPrice;
                 //     } else {
-                //         letPrfoitLoss = ((price - current_rate) - (serviceCharge * 13.7628)) * perQtyPrice;
+                //         letPrfoitLoss = ((price - current_rate) - (serviceCharge * 13.7639)) * perQtyPrice;
                 //     }
 
                 //     let profit_lossDiv = document.getElementById("profit_loss-" + dataId);
                 //     if (profit_lossDiv != null) {
-                //         profit_lossDiv.textContent = `After Charge: ${letPrfoitLoss.toFixed(2)}`;
+                //         profit_lossDiv.textContent = `After Charge: ${letPrfoitLoss.toFixed(3)}`;
                 //     }
 
                 // } catch (e) {
@@ -431,7 +437,7 @@
 
             let new_amount = amount + sum;
             let equityDiv = document.getElementById('equity');
-            equityDiv.textContent = `${(new_amount - totalCharge).toFixed(2)}`;
+            equityDiv.textContent = `${new_amount.toFixed(3)}`;
             // console.log("maxtt_per_K " + maxtt_per_K);
 
             if (maxtt_per_K === null) {
@@ -446,7 +452,7 @@
 
 
             let availableTTB = document.getElementById('availableTTB');
-            availableTTB.textContent = `${(max).toFixed(2)}`;
+            availableTTB.textContent = `${(max).toFixed(3)}`;
             // const equityDiv = document.getElementById('equity');
             // equityDiv.textContent = `$${sellPrice}`;
 
@@ -533,7 +539,7 @@
                     const newRow = document.createElement('tr');
                     newRow.id = `form-row-${rowId}`;
                     newRow.innerHTML = `
-                        <td colspan="14">
+                        <td colspan="{{ auth()->user()->can('update_running_trade') ? 16 : 15 }}">
                             <form id="save-${rowId}"  action="{{ route('admin.buysell.deposit.save') }}" method="POST" >
                                 @csrf
                                 <div class="row d-flex justify-content-center mx-5">
@@ -671,8 +677,8 @@
                     const newRow = document.createElement('tr');
                     newRow.id = `form-row-${rowId}`;
                     newRow.innerHTML = `
-                        <td colspan="14">
-                            <form id="modifyForm-${rowId}"  action="{{ route('admin.buysell.store.price') }}" method="POST" >
+                        <td colspan="{{ auth()->user()->can('update_running_trade') ? 16 : 15 }}">
+                            <form id="modifyForm-${rowId}" class="modify-trade-form" action="{{ route('admin.buysell.store.price') }}" method="POST" >
                                 @csrf
                                 
                                 <div class="row mx-5"
@@ -726,11 +732,17 @@
                                         <input type="text" name="stop_loss" class="form-control"
                                             value="${transactionData.stop_loss == null ? 0 : transactionData.take_profit}" >
                                     </div>
+
+                                    <div class="col-md-3">
+                                        <label for="swap_charge" class="font-weight-bold">Swap Charge</label>
+                                        <input type="number" name="swap_charge" class="form-control" step="any" inputmode="decimal"
+                                            value="${transactionData.swap_charge == null ? 0 : transactionData.swap_charge}" required>
+                                    </div>
                                     
                                     <div class="col-md-3 d-flex justify-content-start align-items-end">
                                         <input type="hidden" id="transactionId" name="transactionId" value="${transactionData.id}">
                                         <div class="form-group" style="margin-bottom:0px !important">
-                                            <button type="submit" class="btn btn-primary submit-btn" id="submitButton" onclick="validateAndSubmit(this, 'modifyForm-${rowId}')" >Submit</button>
+                                            <button type="submit" class="btn btn-primary submit-btn">Save changes</button>
                                         </div>
                                     </div>
                                 </div>
@@ -804,9 +816,9 @@
         document.getElementById('selectedTradeRate').value = selectedTradeRate;
         const profitLoss = document.getElementById('profitLoss');
         if (type === 'sell') {
-            profitLoss.textContent = (tradeAmount - transactionAmount).toFixed(2);
+            profitLoss.textContent = (tradeAmount - transactionAmount).toFixed(3);
         } else {
-            profitLoss.textContent = (transactionAmount - tradeAmount).toFixed(2);
+            profitLoss.textContent = (transactionAmount - tradeAmount).toFixed(3);
         }
 
     }
@@ -848,7 +860,7 @@
                                                 <tbody>
                                                     <tr><td>Date</td><td>${formatDateTime(transactionData.created_at)}</td></tr>
                                                     <tr><td>Type</td><td>${transactionData.type}</td></tr>
-                                                    <tr><td>Amount</td><td>${(transactionData.current_rate * 13.7628 * (transactionData.tt_quantity - transactionData.close_quanntity)).toFixed(2)}</td></tr>
+                                                    <tr><td>Amount</td><td>${(transactionData.current_rate * 13.7639 * (transactionData.tt_quantity - transactionData.close_quanntity)).toFixed(3)}</td></tr>
                                                     <tr><td>${transactionData.type} Rate</td><td>${transactionData.current_rate}</td></tr>
                                                     <tr><td>Quantity</td><td>${transactionData.tt_quantity} TTB</td></tr>
                                                 </tbody>
@@ -862,7 +874,7 @@
                                                     <thead><tr><th>TTB</th><th>Rate</th></tr></thead>
                                                     <tbody id="sellTableBody">
                                                         ${trades.length > 0 ? trades.map(trade => {
-                                                            let oldTradeAmount = (trade.current_rate * 13.7628 * (trade.tt_quantity - trade.close_quanntity)).toFixed(2);
+                                                            let oldTradeAmount = (trade.current_rate * 13.7639 * (trade.tt_quantity - trade.close_quanntity)).toFixed(3);
                                                             return `
                                                                 <tr>
                                                                     <td>
@@ -930,6 +942,74 @@
         document.getElementById(formId).submit();
 
     }
+
+    document.addEventListener('submit', function(event) {
+        const form = event.target;
+        if (!form.matches('.modify-trade-form')) {
+            return;
+        }
+
+        event.preventDefault();
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const submitButton = form.querySelector('.submit-btn');
+        const originalText = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.textContent = 'Saving...';
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: new FormData(form)
+        })
+        .then(async response => {
+            const payload = await response.json();
+            if (!response.ok) {
+                throw new Error(payload.message || 'Unable to save the trade changes.');
+            }
+            return payload;
+        })
+        .then(payload => {
+            const trade = payload.trade;
+            const tradeRow = form.closest('tr').previousElementSibling;
+            const cells = tradeRow.cells;
+            const currentValue = tradeRow.querySelector('.ratelist');
+
+            cells[2].textContent = trade.created_at;
+            cells[3].textContent = trade.type;
+            cells[4].textContent = trade.quantity;
+            cells[5].textContent = trade.open_rate;
+            cells[6].textContent = trade.total_value;
+            cells[7].textContent = trade.service_charge;
+            cells[8].textContent = trade.swap_charge;
+            cells[11].textContent = trade.take_profit;
+            cells[12].textContent = trade.stop_loss;
+
+            currentValue.dataset.type = trade.type;
+            currentValue.dataset.qty = trade.quantity;
+            currentValue.dataset.startrate = trade.total_value;
+            form.closest('tr').remove();
+
+            if (typeof getGoldPrice === 'function') {
+                getGoldPrice();
+            }
+
+            Swal.fire({ icon: 'success', title: 'Saved', text: 'Trade updated successfully.', timer: 1400, showConfirmButton: false });
+        })
+        .catch(error => {
+            Swal.fire({ icon: 'error', title: 'Update failed', text: error.message });
+        })
+        .finally(() => {
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+        });
+    });
 
     function voidTransaction(transactionId) {
         Swal.fire({

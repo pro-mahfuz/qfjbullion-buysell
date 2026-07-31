@@ -48,7 +48,7 @@
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <p><strong>Market Price:</strong> <span
-                                id="marketPrice">{{ number_format($market_price, 2) }}</span></p>
+                                id="marketPrice">{{ number_format($market_price, 3) }}</span></p>
                         <p><strong>Cut Position:</strong> <span style="font-size: 20px;">{{ $cut_position ?? 'N/A' }}
                                 {{ $value }} @if ($value < 0)
                                     (Sell Position)
@@ -88,19 +88,19 @@
                                     @php
                                         $profiLoss = $deposit - $withdraw + ($profit - $loss);
                                     @endphp
-                                    <td>{{ number_format($profiLoss, 2) }}</td>
+                                    <td>{{ number_format($profiLoss, 3) }}</td>
                                     <td>{{ $deposit }}</td>
                                     <td>{{ $withdraw }}</td>
-                                    <td>{{ number_format($profit - $loss, 2) }}</td>
+                                    <td>{{ number_format($profit - $loss, 3) }}</td>
                                     <td>{{ $value * 3.746 }}</td>
                                     <td>{{ $value }}</td>
-                                    <td> {{ number_format(($market_price * 13.7628) / 3.674, 2) }} </td>
-                                    <td> {{ number_format((($market_price * 13.7628) / 3.674) * $value, 2) }} </td>
+                                    <td> {{ number_format(($market_price * 13.7639) / 3.674, 3) }} </td>
+                                    <td> {{ number_format((($market_price * 13.7639) / 3.674) * $value, 3) }} </td>
 
-                                    <td>{{ is_numeric($equity) ? number_format($equity / 3.6715, 2) : '0' }}</td>
-                                    <td>{{ number_format($equity, 2) }}</td>
-                                    <td>{{ number_format($profiLoss ?? 0 + $totalProfitLoss, 2) }}</td>
-                                    <td>{{ number_format(($profiLoss ?? 0 + $totalProfitLoss) - 36.32 * 13.7628 * $value, 2) }}
+                                    <td>{{ is_numeric($equity) ? number_format($equity / 3.6715, 3) : '0' }}</td>
+                                    <td>{{ number_format($equity, 3) }}</td>
+                                    <td>{{ number_format($profiLoss ?? 0 + $totalProfitLoss, 3) }}</td>
+                                    <td>{{ number_format(($profiLoss ?? 0 + $totalProfitLoss) - 36.32 * 13.7639 * $value, 3) }}
                                     </td>
                                 </tr>
                             </tbody>
@@ -170,7 +170,7 @@
                                     <td style="text-align: center">{{ $positionArray['current_rate'] }}</td>
 
                                     <td style="text-align: center">{{ ($positionArray['tt_quantity'] ?? 0) * 3.746 }}</td>
-                                    <td style="text-align: right">{{ number_format($positionArray['profit_loss'], 2) }}
+                                    <td style="text-align: right">{{ number_format($positionArray['profit_loss'], 3) }}
                                     </td>
                                 </tr>
                             @endforeach
@@ -178,7 +178,7 @@
                             <tr class="table-active">
                                 <td colspan="7"><strong>Sub Total Profit/Loss</strong></td>
                                 <td colspan="1" style="text-align: center">
-                                    <strong>{{ number_format(($buyTTB - $sellTTB) * 3.746, 2) }}</strong>
+                                    <strong>{{ number_format(($buyTTB - $sellTTB) * 3.746, 3) }}</strong>
                                 </td>
                                 <td colspan="1" style="text-align: right">
                                     <strong>{{ $totalProfitLoss }}</strong>
@@ -222,16 +222,16 @@
                                             <td>{{ date('d-M-Y', strtotime($detailArray['created_at'])) }}</td>
                                             <td>{{ $detailArray['quantity'] }}</td>
                                             <td>{{ $detailArray['transaction_type'] == 'sell' ? 'Sell' : 'Buy' }}</td>
-                                            <td>{{ number_format($detailArray['starting_rate'], 2) }}</td>
+                                            <td>{{ number_format($detailArray['starting_rate'], 3) }}</td>
                                             <td>{{ date('d-M-Y', strtotime($detailArray['transaction_date'])) }}</td>
                                             <td>{{ $detailArray['transaction_type'] == 'buy' ? 'Sell' : 'Buy' }}</td>
-                                            <td>{{ number_format($detailArray['current_rate'], 2) }}</td>
-                                            <td>{{ number_format($detailArray['transaction_amount'], 2) }}</td>
+                                            <td>{{ number_format($detailArray['current_rate'], 3) }}</td>
+                                            <td>{{ number_format($detailArray['transaction_amount'], 3) }}</td>
                                         </tr>
                                     @endforeach
                                     <tr class="table-active">
                                         <td colspan="9"><strong>Total Profit/Loss</strong></td>
-                                        <td><strong>AED {{ number_format($total_profit_or_loss, 2) }}</strong></td>
+                                        <td><strong>AED {{ number_format($total_profit_or_loss, 3) }}</strong></td>
                                     </tr>
                                 @else
                                     <tr>
@@ -289,7 +289,7 @@
                 isFetching = false;
             }
 
-            // $('#marketPrice').text(previousPrice.toFixed(2));
+            // $('#marketPrice').text(previousPrice.toFixed(3));
 
             if (loader) {
                 $('#loader').hide();

@@ -64,7 +64,7 @@
                                         <td>{{ $row['created_at'] }}</td>
                                         <td>{{ $row['transaction_type'] == 'buy' ? 'sell' : 'buy' }}</td>
                                         <td>{{ $row['current_rate'] }}</td>
-                                        <td>{{ number_format($row['transaction_amount'], 2) }}</td>
+                                        <td>{{ number_format($row['transaction_amount'], 3) }}</td>
 
                                     </tr>
                                 @endforeach

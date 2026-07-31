@@ -131,7 +131,7 @@
                                         <th style="text-align:center;">WITHDRAW</th>
                                     @endif
                                     <th style="text-align:center;">EQUITY</th>
-                                    <th style="text-align:center;">CUT POSITION</th>
+                                    <th style="text-align:center;">MARGIN LIMIT</th>
                                 </tr>
                             </thead>
                 
@@ -141,7 +141,7 @@
                                     <td style="text-align:center; font-size:23px"> {{ $deposit }} </td>
                                     <td style="text-align:center; font-size:23px"> {{ $withdraw }} </td>
                                     <td style="text-align:center; font-size:23px"> <span id="equity">0.00</span> </td>
-                                    <td style="text-align:center; font-size:23px"> <span id="cutposition">{{isset($runningBuySell) ? number_format($customer->cutposition, 2):0 }}</span> </td>
+                                    <td style="text-align:center; font-size:23px"> <span id="cutposition">{{isset($runningBuySell) ? number_format($customer->cutposition, 3):0 }}</span> </td>
                                 </tr>
                 
                             </tbody>
@@ -200,7 +200,7 @@
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label for="bid">TTB QTY</label>
-                                            <input type="number" class="form-control" name="bid_buy" id="bid_buy"
+                                            <input type="number" class="form-control" name="bid_buy" id="bid_buy" step="0.001" min="0.001" inputmode="decimal"
                                                 placeholder="Enter TT" >
                                         </div>
                                         <div class="form-group col-md-6">
@@ -243,7 +243,7 @@
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label for="bid">TTB QTY</label>
-                                            <input type="number" class="form-control" name="bid_sell" id="bid_sell"
+                                            <input type="number" class="form-control" name="bid_sell" id="bid_sell" step="0.001" min="0.001" inputmode="decimal"
                                                 placeholder="Enter TT" >
                                         </div>
                                         <div class="form-group col-md-6">
@@ -308,7 +308,7 @@
                                         
                                         <div class="form-group col-md-4">
                                             <label for="tt">TTB Quantity:</label>
-                                            <input type="number" name="tt" id="tt" class="form-control"
+                                            <input type="number" name="tt" id="tt" class="form-control" step="0.001" min="0.001" inputmode="decimal"
                                                 placeholder="Enter TTB Quantity" required>
                                         </div>
                 
@@ -425,11 +425,11 @@
                 console.log(data);
 
                 let sellPrice = data.value - 0.53;
-                document.getElementById('sellrate').textContent = `$${sellPrice.toFixed(2)}`;
+                document.getElementById('sellrate').textContent = `$${sellPrice.toFixed(3)}`;
                 buyPriceGlobal = parseFloat(sellPrice);
 
                 let buyPrice = sellPrice + 1;
-                document.getElementById('buyrate').textContent = `$${buyPrice.toFixed(2)}`;
+                document.getElementById('buyrate').textContent = `$${buyPrice.toFixed(3)}`;
                 
                 
                 
@@ -454,11 +454,11 @@
                         console.log(maxtt_per_K);
                         
                         
-                        let ttb_limit = Math.round(res.data.equity.toFixed(2) / (1000 / maxtt_per_K));
-                        document.getElementById('availableTTB').textContent = `${ttb_limit.toFixed(2)}`;
+                        let ttb_limit = Math.round(res.data.equity.toFixed(3) / (1000 / maxtt_per_K));
+                        document.getElementById('availableTTB').textContent = `${ttb_limit.toFixed(3)}`;
                         
-                        let total_service_charge = res.data.sum_of_running_service_charge * 13.7628;
-                        document.getElementById('equity').textContent = `${(res.data.equity - total_service_charge).toFixed(2)}`;
+                        let total_service_charge = res.data.sum_of_running_service_charge * 13.7639;
+                        document.getElementById('equity').textContent = `${(res.data.equity - total_service_charge).toFixed(3)}`;
                     },
                     error: function (xhr, status, error) {
                         console.error('AJAX error:', error);
@@ -478,9 +478,9 @@
         function handleTransactionClick(type) {
             console.log("type_" +type)
             var formData = {
-                tt_quantity: document.getElementById('bid_'+type).value,
+                tt_quantity: parseFloat(document.getElementById('bid_'+type).value),
                 current_rate: document.getElementById('gold_value_'+type).value,
-                total_amount_aed: (document.getElementById('gold_value_'+type).value * 3.745 * 3.67 * document.getElementById('bid_'+type).value).toFixed(2),
+                total_amount_aed: (document.getElementById('gold_value_'+type).value * 3.745 * 3.67 * document.getElementById('bid_'+type).value).toFixed(3),
                 close_quanntity: 0,
                 type: type,
                 cut_position: 0,
@@ -488,10 +488,10 @@
                 customer_id: {{ $customer->id }},
                 _token: '{{ csrf_token() }}'
             };
-            var tt_quantity = document.getElementById('bid_'+type).value;
-            var current_rate = document.getElementById('gold_value_'+type).value;
+            var tt_quantity = parseFloat(document.getElementById('bid_'+type).value);
+            var current_rate = parseFloat(document.getElementById('gold_value_'+type).value);
     console.log(tt_quantity);
-            if (tt_quantity == '' || current_rate == '') {
+            if (!Number.isFinite(tt_quantity) || tt_quantity <= 0 || !Number.isFinite(current_rate) || current_rate <= 0) {
                 fire('Please fill all the fields');
                 return false;
             }

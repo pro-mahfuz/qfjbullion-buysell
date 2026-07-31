@@ -210,7 +210,7 @@
                                                     <td>{{ $transaction->transaction_type == 'buy' ? 'sell' : 'buy' }}</td>
                                                     <td>{{ $transaction->current_rate }}</td>
                                                     <td style="text-align: right;padding-right: 20px;">
-                                                        {{ number_format($transaction->transaction_amount, 2) }}</td>
+                                                        {{ number_format($transaction->transaction_amount, 3) }}</td>
 
 
                                                     </td>

@@ -65,7 +65,7 @@
                                 <dl class="mb-0">
                                     <dt>Trade type</dt><dd>{{ ucfirst($transaction->linked_buy->type ?? 'N/A') }}</dd>
                                     <dt>Opened at</dt><dd>{{ optional($transaction->linked_buy?->created_at)->format('d M Y, H:i') ?? 'N/A' }}</dd>
-                                    <dt>Opening rate</dt><dd>{{ isset($transaction->linked_buy?->current_rate) ? number_format($transaction->linked_buy->current_rate, 2) . ' AED' : 'N/A' }}</dd>
+                                    <dt>Opening rate</dt><dd>{{ isset($transaction->linked_buy?->current_rate) ? number_format($transaction->linked_buy->current_rate, 3) . ' AED' : 'N/A' }}</dd>
                                 </dl>
                             </div>
                         </div>
@@ -75,14 +75,14 @@
                                 <dl class="mb-0">
                                     <dt>Trade type</dt><dd>{{ ucfirst($transaction->transaction_type) }}</dd>
                                     <dt>Closed at</dt><dd>{{ optional($transaction->created_at)->format('d M Y, H:i') ?? 'N/A' }}</dd>
-                                    <dt>Closing rate</dt><dd>{{ number_format($transaction->current_rate, 2) }} AED</dd>
+                                    <dt>Closing rate</dt><dd>{{ number_format($transaction->current_rate, 3) }} AED</dd>
                                 </dl>
                             </div>
                         </div>
                     </div>
 
                     <div class="d-flex flex-wrap justify-content-between align-items-center border-top pt-3 mt-1">
-                        <div><span class="text-muted mr-2">Realised profit/loss</span><strong class="h5 mb-0">AED {{ number_format($transaction->transaction_amount, 2) }}</strong></div>
+                        <div><span class="text-muted mr-2">Realised profit/loss</span><strong class="h5 mb-0">AED {{ number_format($transaction->transaction_amount, 3) }}</strong></div>
                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#unmatchTradeModal"><i class="fa fa-unlink mr-1"></i> Unmatch Trade</button>
                     </div>
                 </div>

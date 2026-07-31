@@ -45,12 +45,12 @@
         });
 
         $('#quantity').on('input', function () {
-            $("#pure_quantity").val(($('#quantity').val() * $('#pure_rate').val()).toFixed(2));
-            $("#total_amount").val(($('#pure_quantity').val() * $('#fix_amount').val()).toFixed(2));
+            $("#pure_quantity").val(($('#quantity').val() * $('#pure_rate').val()).toFixed(3));
+            $("#total_amount").val(($('#pure_quantity').val() * $('#fix_amount').val()).toFixed(3));
         });
 
         $('#fix_amount').on('change', function () {
-            $("#total_amount").val(($('#quantity').val() * $(this).val()).toFixed(2));
+            $("#total_amount").val(($('#quantity').val() * $(this).val()).toFixed(3));
         });
 
         $('#supplier_id').on('change', function () {
@@ -108,7 +108,7 @@
             priceDiv.textContent = `Gold Price: $${currentPrice}`;
             $(".fix_amount").val(currentPrice);
             const totalPriceAED = ((currentPrice / ouncesToGrams) * usdToAedRate) * $("#pure_quantity").val();
-            $("#total_amount").val(totalPriceAED.toFixed(2));
+            $("#total_amount").val(totalPriceAED.toFixed(3));
             if (previousPrice !== null) {
                 if (currentPrice > previousPrice) {
                     priceDiv.style.backgroundColor = 'red';

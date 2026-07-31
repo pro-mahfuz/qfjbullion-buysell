@@ -29,7 +29,7 @@
                                     <tr>
                                         <th scope="row">{{ $sl++ }}</th>
                                         <td>{{ $transaction->transaction_date }}</td>
-                                        <td>{{ number_format($transaction->transaction_amount, 2) }}
+                                        <td>{{ number_format($transaction->transaction_amount, 3) }}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -44,7 +44,7 @@
                                     <tr>
                                         <th scope="row">{{ $sl++ }}</th>
                                         <td>{{ $transaction->transaction_date }}</td>
-                                        <td>{{ number_format($transaction->transaction_amount, 2) }}
+                                        <td>{{ number_format($transaction->transaction_amount, 3) }}
                                     </tr>
                                 @endforeach
                             @endif

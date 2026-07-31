@@ -37,7 +37,7 @@
         <div class="row mb-4">
             <div class="col-md-3 mb-2"><div class="customer-stat"><small>Total customers</small><strong>{{ $customerCount }}</strong></div></div>
             <div class="col-md-3 mb-2"><div class="customer-stat"><small>Active customers</small><strong>{{ $activeCustomers }}</strong></div></div>
-            <div class="col-md-4 mb-2"><div class="customer-stat"><small>Combined cash balance</small><strong>AED {{ number_format($totalBalance, 2) }}</strong></div></div>
+            <div class="col-md-4 mb-2"><div class="customer-stat"><small>Combined cash balance</small><strong>AED {{ number_format($totalBalance, 3) }}</strong></div></div>
         </div>
 
         <div class="card">
@@ -56,9 +56,9 @@
                                     <td>
                                         @if ($row->status === 'deactived')<span class="badge badge-warning">Pending</span>@else<span class="badge badge-success">Active</span>@endif
                                     </td>
-                                    <td><span class="metric">Deposit <strong>AED {{ $row->sum_of_deposit }}</strong></span><span class="metric">Balance <strong>AED {{ number_format($row->current_balance, 2) }}</strong></span></td>
+                                    <td><span class="metric">Deposit <strong>AED {{ $row->sum_of_deposit }}</strong></span><span class="metric">Balance <strong>AED {{ number_format($row->current_balance, 3) }}</strong></span></td>
                                     <td><span class="metric">Buy <strong>{{ $row->sum_of_running_buy_ttb }}</strong> · Sell <strong>{{ $row->sum_of_running_sell_ttb }}</strong></span><span class="metric">Net <strong>{{ abs($netTtb) }} {{ $netTtb > 0 ? 'Buy' : ($netTtb < 0 ? 'Sell' : '') }}</strong></span></td>
-                                    <td><span class="metric">Equity <strong>AED {{ number_format($row->equity - $row->sum_of_running_service_charge, 2) }}</strong></span><span class="metric">Margin <strong>{{ number_format($row->margin_gap, 2) }}</strong></span></td>
+                                    <td><span class="metric">Equity <strong>AED {{ number_format($row->equity - $row->sum_of_running_service_charge, 3) }}</strong></span><span class="metric">Margin <strong>{{ number_format($row->margin_gap, 3) }}</strong></span></td>
                                     <td class="text-nowrap">
                                         @can('customer_deatils')<a href="{{ route('admin.buysell.customer.search', ['customer' => $row->customer_code]) }}" class="btn btn-outline-primary btn-sm">Trade</a>@endcan
                                         @can('users_edit')<a href="{{ route('admin.customer.edit', $row->id) }}" class="btn btn-outline-info btn-sm">Edit</a>@endcan

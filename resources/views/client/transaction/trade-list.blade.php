@@ -24,15 +24,15 @@
                         <td>{{ $transaction['created_at'] }}</td>
                         <td>{{ $transaction['type'] }}</td>
                         <td>{{ $transaction['tt_quantity'] - $transaction['close_quanntity'] }}</td>
-                        <td>{{ number_format($transaction['current_rate'], 2) }}</td>
+                        <td>{{ number_format($transaction['current_rate'], 3) }}</td>
                         <td id="oldbalance-{{ $sl }}">
-                            {{ number_format($transaction['current_rate'] * 3.74632 * 3.674 * ($transaction['tt_quantity'] - $transaction['close_quanntity']), 2) }}
+                            {{ number_format($transaction['current_rate'] * 3.74632 * 3.674 * ($transaction['tt_quantity'] - $transaction['close_quanntity']), 3) }}
                         </td>
                         <td><span data-id="{{ $sl }}" data-type="{{ $transaction['type'] }}"
                                 data-qty="{{ $transaction['tt_quantity'] - $transaction['close_quanntity'] }}"
-                                data-startrate="{{ number_format($transaction['current_rate'] * 3.745 * 3.67 * ($transaction['tt_quantity'] - $transaction['close_quanntity']), 2) }}"
-                                class="ratelist">{{ number_format($transaction['current_rate'], 2) }}<span></td>
-                        <td id="balance-{{ $sl }}">{{ number_format($transaction['current_rate'], 2) }}</td>
+                                data-startrate="{{ number_format($transaction['current_rate'] * 3.745 * 3.67 * ($transaction['tt_quantity'] - $transaction['close_quanntity']), 3) }}"
+                                class="ratelist">{{ number_format($transaction['current_rate'], 3) }}<span></td>
+                        <td id="balance-{{ $sl }}">{{ number_format($transaction['current_rate'], 3) }}</td>
                         <td> <a href="#"
                                 class="btn {{ $transaction['type'] == 'buy' ? ' btn-info' : 'btn-danger' }} btn-sm load_modal"
                                 data-toggle="modal"
@@ -85,7 +85,7 @@
 
             // $(".fix_amount").val(currentPrice);
             // const totalPriceAED = (($("#fix_amount").val() / ouncesToGrams) * usdToAedRate) * $("#pure_quantity").val();
-            // $("#total_amount").val(totalPriceAED.toFixed(2));
+            // $("#total_amount").val(totalPriceAED.toFixed(3));
 
             if (previousPrice !== null) {
                 if (currentPrice > previousPrice) {
@@ -109,7 +109,7 @@
 
                 let runningValue = qty * buyPrice * 3.74632 * 3.674;
 
-                $(this).html(runningValue.toFixed(2));
+                $(this).html(runningValue.toFixed(3));
 
                 let oldBalance = parseFloat($("#oldbalance-" + dataId).text().replace(/,/g, ''));
 
@@ -119,7 +119,7 @@
 
                 }
 
-                $("#balance-" + dataId).html(newBalance.toFixed(2));
+                $("#balance-" + dataId).html(newBalance.toFixed(3));
             });
         } catch (error) {
             console.error('Error fetching the gold price:', error);

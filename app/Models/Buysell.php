@@ -22,6 +22,7 @@ class Buysell extends BaseModel
         'tt_quantity',
         'current_rate',
         'service_charge',
+        'swap_charge',
         'cut_position',
         'is_running',
         'created_by',

@@ -184,7 +184,7 @@
             });
 
             // Update the element with id 'total' with the calculated sum
-            $('#unfix_total').val(sum.toFixed(2));
+            $('#unfix_total').val(sum.toFixed(3));
 
 
             const discount_aed = document.querySelectorAll('.discount_aed');
@@ -198,7 +198,7 @@
                     sum_d += value;
                 }
             });
-            $('#discount').val(sum_d.toFixed(2));
+            $('#discount').val(sum_d.toFixed(3));
         }
 
         function calculateUnfix(id) {
@@ -206,10 +206,10 @@
             var pureQuantity = parseFloat($("#pure_quantity_" + id).val()) || 0;
             var discount_usd = parseFloat($("#discount_usd_" + id).val()) || 0;
 
-            var ozValue = (((unfixValue + discount_usd) * 3.674) / 31.1035).toFixed(2);
-            var subtotalValue = (ozValue * pureQuantity).toFixed(2);
+            var ozValue = (((unfixValue + discount_usd) * 3.674) / 31.1035).toFixed(3);
+            var subtotalValue = (ozValue * pureQuantity).toFixed(3);
 
-            $("#discount_aed_" + id).val(((pureQuantity / 31.1035) * discount_usd * 3.674).toFixed(2));
+            $("#discount_aed_" + id).val(((pureQuantity / 31.1035) * discount_usd * 3.674).toFixed(3));
             $("#unfix_oz_" + id).val(ozValue);
             $("#unfix_subtotal_" + id).val(subtotalValue);
 
@@ -380,7 +380,7 @@
                 priceDiv.textContent = `Gold Price: $${currentPrice}`;
                 // $(".fix_amount").val(currentPrice);
                 // const totalPriceAED = ((currentPrice / ouncesToGrams) * usdToAedRate) * $("#pure_quantity").val();
-                // $("#total_amount").val(totalPriceAED.toFixed(2));
+                // $("#total_amount").val(totalPriceAED.toFixed(3));
                 if (previousPrice !== null) {
                     if (currentPrice > previousPrice) {
                         priceDiv.style.backgroundColor = 'red';

@@ -24,7 +24,7 @@
             <div class="col-md-3 mb-2"><div class="closed-stat"><small>Closed trades</small><strong>{{ $summary->total_trades ?? 0 }}</strong></div></div>
             <div class="col-md-3 mb-2"><div class="closed-stat"><small>Buy closes</small><strong>{{ $summary->buy_count ?? 0 }}</strong></div></div>
             <div class="col-md-3 mb-2"><div class="closed-stat"><small>Sell closes</small><strong>{{ $summary->sell_count ?? 0 }}</strong></div></div>
-            <div class="col-md-3 mb-2"><div class="closed-stat"><small>Realised P/L</small><strong>AED {{ number_format($summary->total_profit_loss ?? 0, 2) }}</strong></div></div>
+            <div class="col-md-3 mb-2"><div class="closed-stat"><small>Realised P/L</small><strong>AED {{ number_format($summary->total_profit_loss ?? 0, 3) }}</strong></div></div>
         </div>
 
         <div class="card">
@@ -50,11 +50,11 @@
                                     <td>{{ $transaction->reference_no ?? '—' }}</td>
                                     <td>{{ $transaction->customer->name ?? 'N/A' }}</td>
                                     <td>{{ optional($transaction->linked_buy?->created_at)->format('d M Y') ?? 'N/A' }}</td>
-                                    <td>{{ number_format($transaction->quantity, 2) }}</td>
-                                    <td><span class="badge badge-{{ ($transaction->linked_buy?->type ?? '') === 'buy' ? 'info' : 'danger' }}">{{ strtoupper($transaction->linked_buy?->type ?? 'N/A') }}</span> {{ isset($transaction->linked_buy?->current_rate) ? number_format($transaction->linked_buy->current_rate, 2) : '—' }}</td>
+                                    <td>{{ number_format($transaction->quantity, 3) }}</td>
+                                    <td><span class="badge badge-{{ ($transaction->linked_buy?->type ?? '') === 'buy' ? 'info' : 'danger' }}">{{ strtoupper($transaction->linked_buy?->type ?? 'N/A') }}</span> {{ isset($transaction->linked_buy?->current_rate) ? number_format($transaction->linked_buy->current_rate, 3) : '—' }}</td>
                                     <td>{{ optional($transaction->created_at)->format('d M Y') }}</td>
-                                    <td><span class="badge badge-{{ $transaction->transaction_type === 'buy' ? 'info' : 'danger' }}">{{ strtoupper($transaction->transaction_type) }}</span> {{ number_format($transaction->current_rate, 2) }}</td>
-                                    <td class="number font-weight-bold">{{ number_format($transaction->transaction_amount, 2) }}</td>
+                                    <td><span class="badge badge-{{ $transaction->transaction_type === 'buy' ? 'info' : 'danger' }}">{{ strtoupper($transaction->transaction_type) }}</span> {{ number_format($transaction->current_rate, 3) }}</td>
+                                    <td class="number font-weight-bold">{{ number_format($transaction->transaction_amount, 3) }}</td>
                                 </tr>
                             @empty
                                 <tr><td colspan="9" class="text-center text-muted">No closed trades match these filters.</td></tr>

@@ -35,11 +35,11 @@
                         <th scope="row">{{ $sl++ }}</th>
                         <td>{{ $runningBuySell->created_at }}</td>
                         <td>{{ $runningBuySell->type }}</td>
-                        <td>{{ number_format($runningBuySell->current_rate, 2) }}</td>
+                        <td>{{ number_format($runningBuySell->current_rate, 3) }}</td>
                         <td>{{ $runningBuySell->tt_quantity - $runningBuySell->close_quanntity }}</td>
-                        <td>{{ number_format($runningBuySell->total_amount_aed, 2) }}</td>
-                        <!-- <td>{{ number_format($runningBuySell->current_rate, 2) }}</td>
-                        <td>{{ number_format($runningBuySell->current_rate, 2) }}</td> -->
+                        <td>{{ number_format($runningBuySell->total_amount_aed, 3) }}</td>
+                        <!-- <td>{{ number_format($runningBuySell->current_rate, 3) }}</td>
+                        <td>{{ number_format($runningBuySell->current_rate, 3) }}</td> -->
 
                     </tr>
 
@@ -84,7 +84,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="current_rate">Loss/Profit </label>
-                   <h4>{{ number_format($transaction_amount,2) }}</h4>
+                   <h4>{{ number_format($transaction_amount,3) }}</h4>
                 </div>
             </div>
 

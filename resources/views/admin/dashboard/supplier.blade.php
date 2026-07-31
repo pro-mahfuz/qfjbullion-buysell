@@ -27,15 +27,15 @@
                                 </div>
                                 <div class="card-footer">
                                     <p class="text-muted mb-0">Total Supplier Balance:
-                                        <strong>{{ number_format($suppliersBalance, 2) }}</strong>
+                                        <strong>{{ number_format($suppliersBalance, 3) }}</strong>
                                     </p>
                                     <p class="text-muted mb-0">Fixed Purchases:
                                         <strong>{{ $totalSupplierFixedPurchase }}</strong>
-                                        ({{ number_format($totalSupplierFixedPurchaseAmount, 2) }})
+                                        ({{ number_format($totalSupplierFixedPurchaseAmount, 3) }})
                                     </p>
                                     <p class="text-muted mb-0">Unfixed Purchases:
                                         <strong>{{ $totalSupplierUnfixedPurchase }}</strong>
-                                        ({{ number_format($totalSupplierUnfixedPurchaseAmount, 2) }})
+                                        ({{ number_format($totalSupplierUnfixedPurchaseAmount, 3) }})
                                     </p>
                                 </div>
                             </div>
@@ -51,15 +51,15 @@
                                 </div>
                                 <div class="card-footer">
                                     <p class="text-muted mb-0">Total Client Balance:
-                                        <strong>{{ number_format($clientsBalance, 2) }}</strong>
+                                        <strong>{{ number_format($clientsBalance, 3) }}</strong>
                                     </p>
                                     <p class="text-muted mb-0">Fixed Purchases:
                                         <strong>{{ $totalClientFixedPurchase }}</strong>
-                                        ({{ number_format($totalClientFixedPurchaseAmount, 2) }})
+                                        ({{ number_format($totalClientFixedPurchaseAmount, 3) }})
                                     </p>
                                     <p class="text-muted mb-0">Unfixed Purchases:
                                         <strong>{{ $totalClientUnfixedPurchase }}</strong>
-                                        ({{ number_format($totalClientUnfixedPurchaseAmount, 2) }})
+                                        ({{ number_format($totalClientUnfixedPurchaseAmount, 3) }})
                                     </p>
                                 </div>
                             </div>
@@ -77,7 +77,7 @@
                                         <!-- Deposits Column -->
                                         <div class="col-6 border-end">
                                             <h6 class="text-muted">Total Deposits</h6>
-                                            <h3 class="card-text font-weight-bold">{{ number_format($supplierDeposit, 2) }}
+                                            <h3 class="card-text font-weight-bold">{{ number_format($supplierDeposit, 3) }}
                                             </h3>
                                             <p class="text-muted mb-0">Count: <strong>{{ $supplierDepositCount }}</strong>
                                             </p>
@@ -87,7 +87,7 @@
                                         <div class="col-6">
                                             <h6 class="text-muted">Total Withdrawals</h6>
                                             <h3 class="card-text font-weight-bold">
-                                                {{ number_format($supplierWithdraw, 2) }}
+                                                {{ number_format($supplierWithdraw, 3) }}
                                             </h3>
                                             <p class="text-muted mb-0">Count: <strong>{{ $supplierWithdrawCount }}</strong>
                                             </p>
@@ -107,7 +107,7 @@
                                         <!-- Deposits Column -->
                                         <div class="col-6 border-end">
                                             <h6 class="text-muted">Total Deposits</h6>
-                                            <h3 class="card-text font-weight-bold">{{ number_format($totalDeposit, 2) }}
+                                            <h3 class="card-text font-weight-bold">{{ number_format($totalDeposit, 3) }}
                                             </h3>
                                             <p class="text-muted mb-0">Count: <strong>{{ $depositCount }}</strong></p>
                                         </div>
@@ -115,7 +115,7 @@
                                         <!-- Withdrawals Column -->
                                         <div class="col-6">
                                             <h6 class="text-muted">Total Withdrawals</h6>
-                                            <h3 class="card-text font-weight-bold">{{ number_format($totalWithdraw, 2) }}
+                                            <h3 class="card-text font-weight-bold">{{ number_format($totalWithdraw, 3) }}
                                             </h3>
                                             <p class="text-muted mb-0">Count: <strong>{{ $withdrawCount }}</strong></p>
                                         </div>

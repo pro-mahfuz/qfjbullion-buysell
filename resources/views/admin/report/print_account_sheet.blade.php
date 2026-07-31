@@ -86,9 +86,9 @@
                                         <td></td>
                                         <td>B/F</td>
                                         <td></td>
-                                        <td>{{ number_format($initExpense, 2) }}</td>
-                                        <td>{{ number_format($initIncome, 2) }}</td>
-                                        <td>{{ number_format(($initIncome - $initExpense), 2) }}</td>
+                                        <td>{{ number_format($initExpense, 3) }}</td>
+                                        <td>{{ number_format($initIncome, 3) }}</td>
+                                        <td>{{ number_format(($initIncome - $initExpense), 3) }}</td>
                                     </tr>
                                     <?php
                                         $totalExpenseAmount = $initExpense;
@@ -120,9 +120,9 @@
                                                 </ol>
                                             </td>
                                             <td>{{ sprintf('%06d', $row['reference_no'] ?? $row['id']) }}</td>
-                                            <td>{{ number_format(0, 2) }}</td>
-                                            <td>{{ number_format($row['total_paid'], 2) }}</td>
-                                            <td>{{ number_format($inlineBalance, 2) }}</td>
+                                            <td>{{ number_format(0, 3) }}</td>
+                                            <td>{{ number_format($row['total_paid'], 3) }}</td>
+                                            <td>{{ number_format($inlineBalance, 3) }}</td>
                                         </tr>
                                         @else
                                         <tr> 
@@ -136,13 +136,13 @@
                                             </td>
                                             <td>{{ sprintf('%06d', $row['reference_no'] ?? $row['id']) }}</td>
                                             @if(($row['invoice_type'] == 'expense'))
-                                            <td>{{ number_format($row['total_amount'], 2) }}</td>
-                                            <td>{{ number_format(0, 2) }}</td>
+                                            <td>{{ number_format($row['total_amount'], 3) }}</td>
+                                            <td>{{ number_format(0, 3) }}</td>
                                             @else
-                                            <td>{{ number_format(0, 2) }}</td>
-                                            <td>{{ number_format($row['total_amount'], 2) }}</td>
+                                            <td>{{ number_format(0, 3) }}</td>
+                                            <td>{{ number_format($row['total_amount'], 3) }}</td>
                                             @endif
-                                            <td>{{ number_format($inlineBalance, 2) }}</td>
+                                            <td>{{ number_format($inlineBalance, 3) }}</td>
                                         </tr>
                                         @endif
                                     @endforeach
@@ -150,9 +150,9 @@
                                 <tfoot>
                                     <tr>
                                         <td style="text-align: right;" colspan="3"><strong>Total Amount</strong></td>
-                                        <td>{{ number_format($totalExpenseAmount, 2) }}</td>
-                                        <td>{{ number_format($totalIncomeAmount, 2) }}</td>
-                                        <td>{{ number_format(($totalIncomeAmount - $totalExpenseAmount), 2) }}</td>
+                                        <td>{{ number_format($totalExpenseAmount, 3) }}</td>
+                                        <td>{{ number_format($totalIncomeAmount, 3) }}</td>
+                                        <td>{{ number_format(($totalIncomeAmount - $totalExpenseAmount), 3) }}</td>
                                     </tr>
                                 </tfoot>
                             </table>

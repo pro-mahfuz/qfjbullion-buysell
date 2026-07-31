@@ -133,52 +133,50 @@
             @endif
 
             @can('closed_trade_history')
-                @if ($lastTen)
+                @if ($lastTen->isNotEmpty())
                     <div class="row mt-4">
                         <div class="col-md-12">
                             <div class="card">
-                                <div class="card-header">
-                                    Last 10 Closed Transactions
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span>Last 10 Closed Transactions</span>
+                                    <span class="badge badge-light">{{ $lastTen->count() }} trade{{ $lastTen->count() === 1 ? '' : 's' }}</span>
                                 </div>
                                 <div class="card-body">
-                                    <div class="table-responsive mt-3">
-                                        <table class="table">
-                                            <thead class="thead-dark">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover mb-0">
+                                            <thead style="background-color: #1f6fb2; color: #ffffff;">
                                                 <tr>
                                                     <th scope="col">#</th>
-                                                    <th scope="col">Customer Name</th>
-                                                    <th scope="col">Reference No </th>
-                                                    <th scope="col">B/S Date</th>
-                                                    <th scope="col">Gold Qty</th>
-                                                    <th scope="col">B/S</th>
-                                                    <th scope="col">Rate</th>
-                                                    <th scope="col">Transcation Date</th>
-                                                    <th scope="col">B/S</th>
-                                                    <th scope="col">Rate</th>
-                                                    <th scope="col" style="text-align: right;padding-right: 20px;">P/L</th>
-    
+                                                    <th scope="col">Reference</th>
+                                                    <th scope="col">Opened</th>
+                                                    <th scope="col">Open</th>
+                                                    <th scope="col">Closed</th>
+                                                    <th scope="col">Close</th>
+                                                    <th scope="col" class="text-right">TTB Qty</th>
+                                                    <th scope="col" class="text-right">P/L (AED)</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php $sl = 1; ?>
-                                                @foreach ($lastTen as $transaction)
-                                                    {{-- @dd($transaction->linked_buy->created_at) --}}
+                                                @foreach ($lastTen as $index => $transaction)
+                                                    @php($openingTrade = $transaction->linked_buy)
+                                                    @php($openingType = $openingTrade?->type ?? $transaction->transaction_type)
+                                                    @php($closingType = $openingType === 'buy' ? 'sell' : 'buy')
                                                     <tr>
-                                                        <th scope="row">{{ $sl++ }}</th>
-                                                        <td>{{ $transaction->customer->name }}</td>
-                                                        <td>{{ $transaction->reference_no }}</td>
-                                                        <td>{{ $transaction->linked_buy && $transaction->linked_buy->created_at ? $transaction->linked_buy->created_at->format('Y-m-d') : 'N/A' }}
+                                                        <th scope="row">{{ $index + 1 }}</th>
+                                                        <td><span class="font-weight-bold">{{ $transaction->reference_no ?: '—' }}</span></td>
+                                                        <td>
+                                                            <div>{{ $openingTrade?->created_at?->format('d M Y') ?? '—' }}</div>
+                                                            <small class="text-muted">{{ $openingTrade?->current_rate ? number_format($openingTrade->current_rate, 3) : '—' }}</small>
                                                         </td>
-                                                        <td>{{ $transaction->quantity }}</td>
-                                                        <td>{{ $transaction->transaction_type }}</td>
-                                                        <td>{{ $transaction->linked_buy->current_rate ?? 'N/A' }}</td>
-                                                        <td>{{ $transaction->created_at->format('Y-m-d') }}</td>
-                                                        <td>{{ $transaction->transaction_type == 'buy' ? 'sell' : 'buy' }}</td>
-                                                        <td>{{ $transaction->current_rate }}</td>
-                                                        <td style="text-align: right;padding-right: 20px;">
-                                                            {{ number_format($transaction->transaction_amount, 2) }}</td>
-    
-    
+                                                        <td><span class="badge badge-{{ $openingType === 'buy' ? 'info' : 'danger' }}">{{ strtoupper($openingType) }}</span></td>
+                                                        <td>
+                                                            <div>{{ $transaction->created_at?->format('d M Y, H:i') }}</div>
+                                                            <small class="text-muted">{{ number_format($transaction->current_rate, 3) }}</small>
+                                                        </td>
+                                                        <td><span class="badge badge-{{ $closingType === 'buy' ? 'info' : 'danger' }}">{{ strtoupper($closingType) }}</span></td>
+                                                        <td class="text-right">{{ number_format($transaction->quantity, 3) }}</td>
+                                                        <td class="text-right font-weight-bold {{ $transaction->calculated_profit_loss < 0 ? 'text-danger' : 'text-success' }}">
+                                                            {{ number_format($transaction->calculated_profit_loss, 3) }}
                                                         </td>
                                                     </tr>
                                                 @endforeach

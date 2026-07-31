@@ -80,14 +80,14 @@
                                         <td>{{ $sl }}</td>
                                         <td>{{ date('d-M-Y', strtotime($row->create_date)) }}</td>
                                         <td>{{ $row->title }}</td>
-                                        <td>{{ number_format($row->amount, 2) }}</td>
+                                        <td>{{ number_format($row->amount, 3) }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
                                 <tfoot>
                                     <tr>
                                         <td style="text-align: right;" colspan="3"><strong>Total Amount</strong></td>
-                                        <td>{{ number_format($total_amount, 2) }}</td>
+                                        <td>{{ number_format($total_amount, 3) }}</td>
                                     </tr>
                                 </tfoot>
                             </table>
