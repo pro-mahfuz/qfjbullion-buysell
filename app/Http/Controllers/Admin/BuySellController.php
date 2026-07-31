@@ -680,7 +680,8 @@ class BuySellController extends Controller
         if ($request->expectsJson()) {
             $outstandingQuantity = $buySell->tt_quantity - $buySell->close_quanntity;
             $serviceCharge = $outstandingQuantity * ($buySell->service_charge * 13.7639);
-            $totalValue = ($buySell->current_rate * 13.7639 * $outstandingQuantity) + $serviceCharge + $buySell->swap_charge;
+            $chargeDirection = $buySell->type === 'sell' ? -1 : 1;
+            $totalValue = ($buySell->current_rate * 13.7639 * $outstandingQuantity) + ($chargeDirection * ($serviceCharge + $buySell->swap_charge));
 
             return response()->json([
                 'success' => true,

@@ -174,7 +174,7 @@
                                                             <small class="text-muted">{{ number_format($transaction->current_rate, 3) }}</small>
                                                         </td>
                                                         <td><span class="badge badge-{{ $closingType === 'buy' ? 'info' : 'danger' }}">{{ strtoupper($closingType) }}</span></td>
-                                                        <td class="text-right">{{ number_format($transaction->quantity, 3) }}</td>
+                                                        <td class="text-right">{{ number_format($transaction->display_quantity, 3) }}</td>
                                                         <td class="text-right font-weight-bold {{ $transaction->calculated_profit_loss < 0 ? 'text-danger' : 'text-success' }}">
                                                             {{ number_format($transaction->calculated_profit_loss, 3) }}
                                                         </td>

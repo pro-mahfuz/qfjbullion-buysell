@@ -141,8 +141,7 @@
                                         <td style="text-align: center;" id="oldbalance-{{ $sl }}" style="text-align: center;">
                                             {{ number_format(
                                                 ($transaction->current_rate * 13.7639 * ($transaction->tt_quantity - $transaction->close_quanntity))
-                                                + (($transaction->tt_quantity - $transaction->close_quanntity) * ($transaction->service_charge * 13.7639))
-                                                + ($transaction->swap_charge ?? 0),
+                                                + (($transaction->type === 'sell' ? -1 : 1) * ((($transaction->tt_quantity - $transaction->close_quanntity) * ($transaction->service_charge * 13.7639)) + ($transaction->swap_charge ?? 0))),
                                                 3
                                             ) }}
                                         </td>
@@ -156,7 +155,7 @@
 
                                         
                                         <td style="text-align: center;">
-                                            <span data-id="{{ $sl }}" data-type="{{ $transaction->type }}" data-qty="{{ $transaction->tt_quantity - $transaction->close_quanntity }}" data-startrate="{{ number_format(($transaction->current_rate * 13.7639 * ($transaction->tt_quantity - $transaction->close_quanntity)) + (($transaction->tt_quantity - $transaction->close_quanntity) * ($transaction->service_charge * 13.7639)) + ($transaction->swap_charge ?? 0), 3) }}" class="ratelist">
+                                            <span data-id="{{ $sl }}" data-type="{{ $transaction->type }}" data-qty="{{ $transaction->tt_quantity - $transaction->close_quanntity }}" data-startrate="{{ number_format(($transaction->current_rate * 13.7639 * ($transaction->tt_quantity - $transaction->close_quanntity)) + (($transaction->type === 'sell' ? -1 : 1) * ((($transaction->tt_quantity - $transaction->close_quanntity) * ($transaction->service_charge * 13.7639)) + ($transaction->swap_charge ?? 0))), 3) }}" class="ratelist">
                                             <span>
                                         </td>
 

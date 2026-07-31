@@ -176,7 +176,14 @@ class TransactionService
         $linkedBuysells = Buysell::whereIn('id', $referenceIds)->get()->keyBy('id');
 
         $netMatcheds->transform(function ($transaction) use ($linkedBuysells) {
-            $transaction->linked_buy = $linkedBuysells->get($transaction->reference_row);
+            $linkedTrade = $linkedBuysells->get($transaction->reference_row);
+            $quantity = is_numeric($transaction->quantity) ? (float) $transaction->quantity : 0;
+            if ($quantity <= 0 && $linkedTrade) {
+                $quantity = max((float) $linkedTrade->tt_quantity - (float) $linkedTrade->close_quanntity, 0);
+            }
+
+            $transaction->linked_buy = $linkedTrade;
+            $transaction->display_quantity = $quantity;
             return $transaction;
         });
 
@@ -858,12 +865,15 @@ class TransactionService
             ->get();
 
         $linkedTrades = Buysell::whereIn('id', $trans->pluck('reference_row')->filter()->unique())
-            ->get(['id', 'type', 'current_rate', 'created_at', 'service_charge', 'swap_charge', 'tt_quantity'])
+            ->get(['id', 'type', 'current_rate', 'created_at', 'service_charge', 'swap_charge', 'tt_quantity', 'close_quanntity'])
             ->keyBy('id');
 
         return $trans->each(function ($transaction) use ($linkedTrades) {
             $openingTrade = $linkedTrades->get($transaction->reference_row);
             $quantity = is_numeric($transaction->quantity) ? (float) $transaction->quantity : 0;
+            if ($quantity <= 0 && $openingTrade) {
+                $quantity = max((float) $openingTrade->tt_quantity - (float) $openingTrade->close_quanntity, 0);
+            }
             $openingRate = is_numeric($transaction->starting_rate) ? (float) $transaction->starting_rate : (float) ($openingTrade->current_rate ?? 0);
             $closingRate = is_numeric($transaction->current_rate) ? (float) $transaction->current_rate : 0;
             $serviceCharge = round($quantity * ((float) ($openingTrade->service_charge ?? 0) * 13.7639), 3);
@@ -871,11 +881,13 @@ class TransactionService
             $swapCharge = round($openingQuantity > 0
                 ? ((float) ($openingTrade->swap_charge ?? 0) * ($quantity / $openingQuantity))
                 : (float) ($openingTrade->swap_charge ?? 0), 3);
-            $totalValue = round(($openingRate * 13.7639 * $quantity) + $serviceCharge + $swapCharge, 3);
-            $currentValue = round($closingRate * 13.7639 * $quantity, 3);
             $openingType = $openingTrade->type ?? $transaction->transaction_type;
+            $chargeDirection = $openingType === 'sell' ? -1 : 1;
+            $totalValue = round(($openingRate * 13.7639 * $quantity) + ($chargeDirection * ($serviceCharge + $swapCharge)), 3);
+            $currentValue = round($closingRate * 13.7639 * $quantity, 3);
 
             $transaction->setAttribute('linked_buy', $openingTrade);
+            $transaction->setAttribute('display_quantity', $quantity);
             $transaction->setAttribute('calculated_profit_loss', round(($openingType === 'buy'
                 ? $currentValue - $totalValue
                 : $totalValue - $currentValue), 3));
