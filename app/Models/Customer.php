@@ -76,6 +76,11 @@ class Customer extends BaseModel
         return $this->belongsTo(Referral::class, 'referral_code', 'referral_id');
     }
 
+    public function business()
+    {
+        return $this->belongsTo(Bussiness::class, 'business_id');
+    }
+
 
     public function scopeActive($query)
     {

@@ -30,8 +30,10 @@ class CustomerController extends Controller
 
     public function customerList()
     {
-        //dd($this->customerService->getCustomers());
-        return view('admin.customer.list', ['customers' => $this->customerService->getCustomers()]);
+        return view('admin.customer.list', [
+            'customers' => $this->customerService->getCustomers(),
+            'showBusiness' => auth()->user()->hasRole('Super Admin'),
+        ]);
     }
 
 

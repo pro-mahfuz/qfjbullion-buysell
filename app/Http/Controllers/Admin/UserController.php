@@ -33,7 +33,7 @@ class UserController extends Controller
                 ->where('user_has_business.bussiness_id', $businessId);
         }
 
-        $users = $usersQuery->select('users.*')->get(); // Ensure only 'users' columns are selected
+        $users = $usersQuery->select('users.*')->with('roles:id,name')->get(); // Ensure only 'users' columns are selected
 
         return view('admin.users.index', compact('users'));
     }

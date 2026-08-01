@@ -45,16 +45,27 @@
             <div class="card-body">
                 <div class="table-responsive">
                     <table id="customer-table" class="table table-hover customer-table mb-0" style="width:100%">
-                        <thead><tr><th>#</th><th>Customer</th><th>Contact</th><th>Status</th><th>Cash position</th><th>Gold position</th><th>Equity &amp; margin</th><th>Actions</th></tr></thead>
+                        <thead><tr><th>#</th><th>Customer</th>@if ($showBusiness)<th>Business</th>@endif<th>Contact</th><th>Status</th><th>Cash position</th><th>Gold position</th><th>Equity &amp; margin</th><th>Actions</th></tr></thead>
                         <tbody>
                             @foreach ($customers as $row)
                                 @php $netTtb = $row->sum_of_running_buy_ttb - $row->sum_of_running_sell_ttb; @endphp
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td><strong>{{ $row->name }}</strong><span class="metric">{{ $row->customer_code }}</span></td>
+                                    @if ($showBusiness)<td><strong>{{ $row->business?->name ?? '—' }}</strong></td>@endif
                                     <td>{{ $row->phone ?: '—' }}<span class="metric">{{ $row->email ?: '' }}</span></td>
                                     <td>
-                                        @if ($row->status === 'deactived')<span class="badge badge-warning">Pending</span>@else<span class="badge badge-success">Active</span>@endif
+                                        @if ($row->status === 'deactived')
+                                            <span class="badge badge-warning">Pending</span>
+                                            @can('customer_active')
+                                                <form action="{{ route('admin.customer.enable') }}" method="POST" class="d-inline-block ml-1">@csrf<input type="hidden" name="id" value="{{ $row->id }}"><button type="submit" class="btn btn-outline-success btn-sm">Activate</button></form>
+                                            @endcan
+                                        @else
+                                            <span class="badge badge-success">Active</span>
+                                            @can('customer_active')
+                                                <form action="{{ route('admin.customer.disable') }}" method="POST" class="d-inline-block ml-1" onsubmit="return confirm('Disable this customer?');">@csrf<input type="hidden" name="id" value="{{ $row->id }}"><button type="submit" class="btn btn-outline-danger btn-sm">Deactivate</button></form>
+                                            @endcan
+                                        @endif
                                     </td>
                                     <td><span class="metric">Deposit <strong>AED {{ $row->sum_of_deposit }}</strong></span><span class="metric">Balance <strong>AED {{ number_format($row->current_balance, 3) }}</strong></span></td>
                                     <td><span class="metric">Buy <strong>{{ $row->sum_of_running_buy_ttb }}</strong> · Sell <strong>{{ $row->sum_of_running_sell_ttb }}</strong></span><span class="metric">Net <strong>{{ abs($netTtb) }} {{ $netTtb > 0 ? 'Buy' : ($netTtb < 0 ? 'Sell' : '') }}</strong></span></td>

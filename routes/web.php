@@ -158,8 +158,8 @@ Route::middleware(['auth:web', 'otpcheckMiddleware'])->prefix('admin')->name('ad
         Route::post('/customer-update', [CustomerController::class, 'customerUpdate'])->name('customer.update')->middleware('acl:customer_action');
         Route::get('/customer-details/{id}', [CustomerController::class, 'customerDetails'])->name('customer.details')->middleware('acl:customer_action');
         Route::get('/customer/{id}', [CustomerController::class, 'customerView'])->name('customer')->middleware('acl:customer_action');
-        Route::post('disable-customer', [CustomerController::class, 'disableCustomer'])->name('customer.disable')->middleware('acl:customer_action');
-        Route::post('enable-customer', [CustomerController::class, 'enableCustomer'])->name('customer.enable')->middleware('acl:customer_action');
+        Route::post('disable-customer', [CustomerController::class, 'disableCustomer'])->name('customer.disable')->middleware('acl:customer_active');
+        Route::post('enable-customer', [CustomerController::class, 'enableCustomer'])->name('customer.enable')->middleware('acl:customer_active');
         Route::delete('delete-customer/{id}', [CustomerController::class, 'deleteCustomer'])->name('customer.delete')->middleware('acl:customer_action');
     });
 

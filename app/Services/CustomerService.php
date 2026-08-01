@@ -24,7 +24,7 @@ class CustomerService
 
     public function getCustomers(): Collection
     {
-        
+        $isSuperAdmin = auth()->check() && auth()->user()->hasRole('Super Admin');
         $marketPrice = 0;
         $response = Http::get('https://qfjbullion.com/rate');
         //dd($response->json());
@@ -34,8 +34,25 @@ class CustomerService
             $marketPrice = isset($data['value']) ? ($data['value'] - 0.53) : 0;
         }
         
-        $customers = Customer::orderBy('id', 'desc')->get()->map(function ($customer) use ($marketPrice) {
-            $tran = Transaction::where('customer_id', $customer->id)
+        $customerQuery = Customer::with('business:id,name')->orderBy('id', 'desc');
+
+        if ($isSuperAdmin) {
+            $customerQuery->withoutGlobalScope('business_id');
+        }
+
+        $customers = $customerQuery->get()->map(function ($customer) use ($marketPrice, $isSuperAdmin) {
+            $transactionQuery = Transaction::where('customer_id', $customer->id);
+            $buySellQuery = Buysell::where([
+                'customer_id' => $customer->id,
+                'is_running' => 1,
+            ]);
+
+            if ($isSuperAdmin) {
+                $transactionQuery->withoutGlobalScope('business_id');
+                $buySellQuery->withoutGlobalScope('business_id');
+            }
+
+            $tran = $transactionQuery
                 ->selectRaw('
                     SUM(CASE WHEN transaction_type = "deposit" THEN transaction_amount ELSE 0 END) as sum_of_deposit,
                     SUM(CASE WHEN transaction_type = "withdraw" THEN transaction_amount ELSE 0 END) as sum_of_withdraw,
@@ -43,10 +60,7 @@ class CustomerService
                     SUM(CASE WHEN transaction_type = "buy" THEN transaction_amount ELSE 0 END) as sum_of_buy_profit_loss
                 ')->first();
         
-            $buySell = Buysell::where([
-                'customer_id' => $customer->id,
-                'is_running' => 1
-            ])->selectRaw('
+            $buySell = $buySellQuery->selectRaw('
                     SUM(CASE WHEN type = "sell" THEN tt_quantity ELSE 0 END) as sum_of_running_sell_ttb,
                     SUM(CASE WHEN type = "buy" THEN tt_quantity ELSE 0 END) as sum_of_running_buy_ttb,
                     SUM(CASE WHEN type = "sell" THEN current_rate - ? ELSE 0 END) as sum_of_running_sell_profit,

@@ -58,6 +58,9 @@ class TransactionController extends Controller
             // }
             $postData['business_id'] = \Request::session()->get('bussinessId');
             $postData['created_by'] = \Auth::user()->full_name;
+            // Deposits and withdrawals do not have a trade quantity, but the
+            // transaction table requires one for every record.
+            $postData['quantity'] = is_numeric($postData['quantity'] ?? null) ? $postData['quantity'] : 0;
             //  dd($postData);
             Transaction::create($postData);
 
