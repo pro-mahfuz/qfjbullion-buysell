@@ -105,7 +105,10 @@ class LoginController extends Controller
             //check if user has business
             $user = auth()->user()->load('business');
             $business = $user->business->first();
-            $image = $business->bussiness_id ? DB::table('bussiness')->where('id', $business->bussiness_id)->first()->logo : null;
+            $businessDetails = $business?->bussiness_id
+                ? DB::table('bussiness')->where('id', $business->bussiness_id)->first()
+                : null;
+            $image = $businessDetails?->logo;
             if ($business) {
                 Session::put('bussinessId', $business->bussiness_id);
                 Session::put('image', $image);
