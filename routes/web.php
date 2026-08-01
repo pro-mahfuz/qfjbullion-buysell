@@ -26,6 +26,7 @@ use App\Services\GoldService;
 use App\Http\Controllers\Client\Auth\LoginController as ClientLoginController;
 use App\Http\Controllers\Client\DashboardController as ClientDashboardController;
 
+Route::redirect('/', '/admin/login');
 
 Route::get('/rate', function () {
     $response = Http::get('https://qfjbullion.com/rate');
