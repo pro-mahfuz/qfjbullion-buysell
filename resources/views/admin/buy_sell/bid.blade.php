@@ -277,8 +277,7 @@
                                         <td>
                                             <div class="d-flex ">
                                                 <!-- Update Button -->
-                                                <button class="btn btn-primary btn-sm load_modal me-2"
-                                                    data-bs-toggle="modal"
+                                                <button type="button" class="btn btn-primary btn-sm pending-edit-modal me-2"
                                                     data-action="{{ route('admin.buysell.pending.edit', ['id' => $pen->id]) }}">
                                                     Update
                                                 </button>
@@ -308,6 +307,30 @@
 @endcan
 
 <script>
+    document.addEventListener('click', function(e) {
+        const button = e.target.closest('.pending-edit-modal');
+        if (!button) {
+            return;
+        }
+
+        e.preventDefault();
+        const url = button.dataset.action;
+
+        $.get(url)
+            .done(function(response) {
+                $('#dynamicModal').remove();
+                $('body').append(response);
+                $('#dynamicModal').modal('show');
+            })
+            .fail(function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Unable to load',
+                    text: 'The pending trade could not be opened for editing.'
+                });
+            });
+    });
+
     let previousPrice = null;
     let isFetching = false;
     let rateErrorShown = false;

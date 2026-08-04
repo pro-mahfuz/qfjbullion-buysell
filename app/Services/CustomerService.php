@@ -52,6 +52,9 @@ class CustomerService
                 $buySellQuery->withoutGlobalScope('business_id');
             }
 
+            $transactions = (clone $transactionQuery)->get();
+            $runningTrades = (clone $buySellQuery)->get();
+
             $tran = $transactionQuery
                 ->selectRaw('
                     SUM(CASE WHEN transaction_type = "deposit" THEN transaction_amount ELSE 0 END) as sum_of_deposit,
@@ -61,8 +64,8 @@ class CustomerService
                 ')->first();
         
             $buySell = $buySellQuery->selectRaw('
-                    SUM(CASE WHEN type = "sell" THEN tt_quantity ELSE 0 END) as sum_of_running_sell_ttb,
-                    SUM(CASE WHEN type = "buy" THEN tt_quantity ELSE 0 END) as sum_of_running_buy_ttb,
+                    SUM(CASE WHEN type = "sell" THEN GREATEST(tt_quantity - COALESCE(close_quanntity, 0), 0) ELSE 0 END) as sum_of_running_sell_ttb,
+                    SUM(CASE WHEN type = "buy" THEN GREATEST(tt_quantity - COALESCE(close_quanntity, 0), 0) ELSE 0 END) as sum_of_running_buy_ttb,
                     SUM(CASE WHEN type = "sell" THEN current_rate - ? ELSE 0 END) as sum_of_running_sell_profit,
                     SUM(CASE WHEN type = "buy" THEN ? - current_rate ELSE 0 END) as sum_of_running_buy_profit,
                     SUM(service_charge) as sum_of_running_service_charge
@@ -73,15 +76,20 @@ class CustomerService
             $sum_of_sell_ttb = $buySell->sum_of_running_sell_ttb ?? 0;
             $active_ttb = $sum_of_buy_ttb - $sum_of_sell_ttb;
         
-            $equity = app('App\Services\TransactionService')->getEquity($customer->id, $marketPrice);
+            $totalDeposits = (float) ($tran->sum_of_deposit ?? 0);
+            $totalWithdrawals = abs((float) ($tran->sum_of_withdraw ?? 0));
+            $realisedProfitLoss = $this->transactionService->calculateRealisedProfitLoss($transactions);
+            $cashBalance = $totalDeposits - $totalWithdrawals + $realisedProfitLoss;
+            $unrealisedProfitLoss = $this->transactionService->calculateUnrealisedProfitLoss($runningTrades, (float) $marketPrice);
+            $equity = $cashBalance + $unrealisedProfitLoss;
             $margin_gap = 0;
             $margin = 0;
         
             if ($active_ttb != 0) {
                 $margin_gap = ($equity / abs($active_ttb)) / 13.7639;
-                $margin = $active_ttb > 0
+                $margin = abs($active_ttb > 0
                     ? $marketPrice - $margin_gap
-                    : $margin_gap + $marketPrice;
+                    : $margin_gap + $marketPrice);
             }
         
             if (!$tran) {
@@ -108,7 +116,7 @@ class CustomerService
             $customer->sum_of_running_buy_profit = $buySell->sum_of_running_buy_profit;
             $customer->sum_of_running_sell_profit = $buySell->sum_of_running_sell_profit;
             $customer->current_profit_loss = number_format(($tran->sum_of_sell_profit_loss + $tran->sum_of_buy_profit_loss), 3);
-            $customer->current_balance = app('App\Services\TransactionService')->getCurrentBalance($customer->id);
+            $customer->current_balance = $cashBalance;
             $customer->equity = $equity;
             $customer->margin_gap = $margin_gap;
             $customer->margin = $margin;

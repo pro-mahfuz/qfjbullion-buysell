@@ -170,6 +170,12 @@ class TransactionController extends Controller
 
         $netMatched = $startDate && $endDate ? $netMatched->whereBetween('created_at', [$startDate, $endDate]) : $netMatched;
         $outSandingPostions = $startDate && $endDate ? $outSandingPostions->whereBetween('created_at', [$startDate, $endDate]) : $outSandingPostions;
+        $realisedProfitLoss = $this->transactionService->calculateRealisedProfitLoss($netMatched);
+        $correctedBalance = (float) ($tran->sum_of_deposit ?? 0)
+            - abs((float) ($tran->sum_of_withdraw ?? 0))
+            + $realisedProfitLoss;
+        $unrealisedProfitLoss = $this->transactionService->calculateUnrealisedProfitLoss($runningBuySell, (float) $sellPrice);
+        $correctedEquity = $correctedBalance + $unrealisedProfitLoss;
         
         
         // Return the view with all data
@@ -229,6 +235,11 @@ class TransactionController extends Controller
                 'pending' => $pending,
                 'data' => $data,
                 'runningBuySell' => $runningBuySell,
+                'corrected_realised_profit_loss' => $realisedProfitLoss,
+                'corrected_balance' => $correctedBalance,
+                'corrected_equity' => $correctedEquity,
+                'show_service_charge' => false,
+                'show_closed_service_charge' => false,
             ]
         )->setPaper('a4', 'landscape');
         return $pdf->download($statementFilename);
