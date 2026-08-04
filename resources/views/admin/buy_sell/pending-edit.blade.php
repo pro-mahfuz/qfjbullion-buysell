@@ -30,12 +30,11 @@
                         <!-- TT Quantity -->
                         {{-- @dd($transaction->limit) --}}
                         <div class="form-group col-md-4">
-                            <label for="{{ $transaction->limit != 0 ? 'limit' : ' stop' }}"
-                                id="{{ $transaction->limit != 0 ? 'limit' : ' stop' }}">
-                                {{ $transaction->limit != 0 ? 'Limit' : ' Stop' }}:</label>
-                            <input type="text" name="{{ $transaction->limit != 0 ? 'limit' : ' stop' }}"
-                                id="{{ $transaction->limit != 0 ? 'limit' : ' stop' }}" class="form-control"
-                                 placeholder="{{ $transaction->limit != 0 ? 'limit' : ' stop' }}"
+                            <label for="{{ $transaction->limit != 0 ? 'limit' : 'stop' }}">
+                                {{ $transaction->limit != 0 ? 'Limit' : 'Stop' }}:</label>
+                            <input type="text" name="{{ $transaction->limit != 0 ? 'limit' : 'stop' }}"
+                                id="{{ $transaction->limit != 0 ? 'limit' : 'stop' }}" class="form-control"
+                                 placeholder="{{ $transaction->limit != 0 ? 'limit' : 'stop' }}"
                                 value="{{ $transaction->limit != 0 ? $transaction->limit : $transaction->stop }}">
                             <div class="invalid-feedback" style="display: none;">Please enter a valid number (up to 4
                                 decimal places).</div>

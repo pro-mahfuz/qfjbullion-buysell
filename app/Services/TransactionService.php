@@ -36,6 +36,7 @@ class TransactionService
         $amount = abs($data->transaction_amount);
 
         $transaction = Transaction::findOrFail($data->id);
+        $transactionDate = Carbon::parse($data->transaction_date)->format('Y-m-d');
 
         if ($data->type === 'withdraw') {
             $currentBalance = $this->getCurrentBalance($transaction->customer_id);
@@ -43,15 +44,14 @@ class TransactionService
             if ($currentBalance < $amount) {
                 throw new \Exception('Insufficient balance');
             }
-            $transaction->update(['transaction_amount' => -$amount]);
+            $transaction->transaction_amount = -$amount;
         } else {
-
-            $transaction->update(['transaction_amount' => $amount]);
+            $transaction->transaction_amount = $amount;
         }
-
-
-
-
+        $transaction->transaction_date = $transactionDate;
+        $transaction->actual_amount = $data->actual_amount;
+        $transaction->note = $data->note;
+        $transaction->save();
     }
 
 
@@ -188,6 +188,48 @@ class TransactionService
         });
 
         return $netMatcheds;
+    }
+
+    public function calculateRealisedProfitLoss($transactions): float
+    {
+        return (float) $this->getNetMatched($transactions)->sum(function ($detail) {
+            $closedQuantity = (float) ($detail->display_quantity ?? $detail->quantity);
+            $openingTrade = $detail->linked_buy;
+            $openingRate = is_numeric($detail->starting_rate)
+                ? (float) $detail->starting_rate
+                : (float) ($openingTrade->current_rate ?? 0);
+            $closingRate = is_numeric($detail->current_rate) ? (float) $detail->current_rate : 0;
+            $serviceCharge = $closedQuantity * ((float) ($openingTrade->service_charge ?? 0) * 13.7639);
+            $openingQuantity = (float) ($openingTrade->tt_quantity ?? $closedQuantity);
+            $swapCharge = $openingQuantity > 0
+                ? ((float) ($openingTrade->swap_charge ?? 0) * ($closedQuantity / $openingQuantity))
+                : (float) ($openingTrade->swap_charge ?? 0);
+            $chargeDirection = $detail->transaction_type === 'sell' ? -1 : 1;
+            $totalValue = ($openingRate * 13.7639 * $closedQuantity)
+                + ($chargeDirection * ($serviceCharge + $swapCharge));
+            $currentValue = $closingRate * 13.7639 * $closedQuantity;
+
+            return $detail->transaction_type === 'buy'
+                ? $currentValue - $totalValue
+                : $totalValue - $currentValue;
+        });
+    }
+
+    public function calculateUnrealisedProfitLoss($runningTrades, float $marketPrice): float
+    {
+        return (float) collect($runningTrades)->sum(function ($trade) use ($marketPrice) {
+            $quantity = max((float) $trade->tt_quantity - (float) $trade->close_quanntity, 0);
+            $currentValue = $marketPrice * 13.7639 * $quantity;
+            $serviceCharge = (float) ($trade->service_charge ?? 0) * 13.7639 * $quantity;
+            $swapCharge = (float) ($trade->swap_charge ?? 0);
+            $chargeDirection = $trade->type === 'sell' ? -1 : 1;
+            $openingValue = ((float) $trade->current_rate * 13.7639 * $quantity)
+                + ($chargeDirection * ($serviceCharge + $swapCharge));
+
+            return $trade->type === 'buy'
+                ? $currentValue - $openingValue
+                : $openingValue - $currentValue;
+        });
     }
 
 

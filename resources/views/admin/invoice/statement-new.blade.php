@@ -193,14 +193,38 @@
                     @php
                         $netTtb = $data['sum_of_running_buy_ttb'] - $data['sum_of_running_sell_ttb'];
                         $activeTtb = abs($netTtb);
-                        $netEquity = $data['equity'] - ($data['sum_of_running_service_charge'] * 13.7639);
+                        $realisedProfitLoss = $net_matched->sum(function ($detail) {
+                            $closedQuantity = (float) ($detail->display_quantity ?? $detail->quantity);
+                            $openingTrade = $detail->linked_buy;
+                            $openingRate = is_numeric($detail->starting_rate)
+                                ? (float) $detail->starting_rate
+                                : (float) ($openingTrade->current_rate ?? 0);
+                            $closingRate = is_numeric($detail->current_rate) ? (float) $detail->current_rate : 0;
+                            $serviceCharge = $closedQuantity * ((float) ($openingTrade->service_charge ?? 0) * 13.7639);
+                            $openingQuantity = (float) ($openingTrade->tt_quantity ?? $closedQuantity);
+                            $swapCharge = $openingQuantity > 0
+                                ? ((float) ($openingTrade->swap_charge ?? 0) * ($closedQuantity / $openingQuantity))
+                                : (float) ($openingTrade->swap_charge ?? 0);
+                            $chargeDirection = $detail->transaction_type === 'sell' ? -1 : 1;
+                            $totalValue = ($openingRate * 13.7639 * $closedQuantity)
+                                + ($chargeDirection * ($serviceCharge + $swapCharge));
+                            $currentValue = $closingRate * 13.7639 * $closedQuantity;
+
+                            return $detail->transaction_type === 'buy'
+                                ? $currentValue - $totalValue
+                                : $totalValue - $currentValue;
+                        });
+                        $totalDeposits = (float) str_replace(',', '', $data['sum_of_deposit']);
+                        $totalWithdrawals = abs((float) str_replace(',', '', $data['sum_of_withdraw']));
+                        $cashBalanceAfterProfitLoss = $totalDeposits - $totalWithdrawals + $realisedProfitLoss;
+                        $netEquity = $cashBalanceAfterProfitLoss + $runningTTB_profit;
                         $withdrawable = $value != 0 && $activeTtb != 0 ? $netEquity - ($netEquity / $activeTtb) : 0;
                     @endphp
                     <div class="metric-grid">
                         <div class="metric"><span class="metric__label">Deposits</span><span class="metric__value">AED {{ $data['sum_of_deposit'] }}</span></div>
                         <div class="metric"><span class="metric__label">Withdrawals</span><span class="metric__value">AED {{ $data['sum_of_withdraw'] }}</span></div>
-                        <div class="metric"><span class="metric__label">Realised P/L</span><span class="metric__value">AED {{ number_format((float) str_replace(',', '', $data['current_profit_loss']), 3) }}</span></div>
-                        <div class="metric"><span class="metric__label">Cash balance</span><span class="metric__value">AED {{ number_format($data['current_balance'], 3) }}</span></div>
+                        <div class="metric"><span class="metric__label">Realised P/L</span><span class="metric__value">AED {{ number_format($realisedProfitLoss, 3) }}</span></div>
+                        <div class="metric"><span class="metric__label">Cash balance</span><span class="metric__value">AED {{ number_format($cashBalanceAfterProfitLoss, 3) }}</span></div>
                         <div class="metric"><span class="metric__label">Net gold position</span><span class="metric__value">{{ $activeTtb }} TTB {{ $netTtb < 0 ? 'Sell' : ($netTtb > 0 ? 'Buy' : '') }}</span></div>
                         <div class="metric"><span class="metric__label">Position value</span><span class="metric__value">AED {{ $value != 0 ? number_format($market_price * abs($value) * 13.7639, 3) : '0.00' }}</span></div>
                         <div class="metric"><span class="metric__label">Equity</span><span class="metric__value">AED {{ number_format($netEquity, 3) }}</span></div>
@@ -320,11 +344,11 @@
                                 <tr>
                                     <th>SL</th>
                                     <th>Item Code</th>
-                                    <th>Date</th>
+                                    <th>Open Date</th>
                                     <th>Gold Qty</th>
                                     <th>B/S</th>
                                     <th>Rate</th>
-                                    <th>Date</th>
+                                    <th>Closed Date</th>
                                     <th>B/S</th>
                                     <th>Rate</th>
                                     <th>Service Charge (AED)</th>
@@ -362,11 +386,11 @@
                                         <tr>
                                             <td>{{ $i++ }}</td>
                                             <td>TTB</td>
-                                            <td>{{ date('d-M-Y', strtotime($detail->created_at)) }}</td>
+                                            <td>{{ $openingTrade?->created_at ? date('d-M-Y', strtotime($openingTrade->created_at)) : '—' }}</td>
                                             <td>{{ number_format($detail->display_quantity ?? $detail->quantity, 3) }}</td>
                                             <td>{{ $detail->transaction_type == 'sell' ? 'Sell' : 'Buy' }}</td>
                                             <td>{{ number_format($detail->starting_rate, 3) }}</td>
-                                            <td>{{ date('d-M-Y', strtotime($detail->transaction_date)) }}</td>
+                                            <td>{{ date('d-M-Y', strtotime($detail->transaction_date ?? $detail->created_at)) }}</td>
                                             <td>{{ $detail->transaction_type == 'buy' ? 'Sell' : 'Buy' }}</td>
                                             <td>{{ number_format($detail->current_rate, 3) }}</td>
                                             <td>{{ number_format($serviceCharge, 3) }}</td>

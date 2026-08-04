@@ -53,7 +53,10 @@ class BuySellController extends Controller
             if ($customer) {
                 $transactions = $this->transactionService->getTranscations($customer->id, ['deposit', 'withdraw', 'buy', 'sell']);
                 list($deposit, $withdraw, $buy, $sell) = $this->transactionService->getTotalAmount($transactions);
-                $current_amount = $this->transactionService->getCurrentBalance($customer->id);
+                $realisedProfitLoss = $this->transactionService->calculateRealisedProfitLoss($transactions);
+                $current_amount = $transactions->where('transaction_type', 'deposit')->sum('transaction_amount')
+                    - abs($transactions->where('transaction_type', 'withdraw')->sum('transaction_amount'))
+                    + $realisedProfitLoss;
                 $runningBuySell = Buysell::where(['customer_id' => $customer->id, 'is_running' => 1])
                     ->orderBy('id', 'desc')
                     ->get();
@@ -158,7 +161,10 @@ class BuySellController extends Controller
             if ($customer) {
                 $transactions = $this->transactionService->getTranscations($customer->id, ['deposit', 'withdraw', 'buy', 'sell']);
                 list($deposit, $withdraw, $buy, $sell) = $this->transactionService->getTotalAmount($transactions);
-                $current_amount = $this->transactionService->getCurrentBalance($customer->id);
+                $realisedProfitLoss = $this->transactionService->calculateRealisedProfitLoss($transactions);
+                $current_amount = $transactions->where('transaction_type', 'deposit')->sum('transaction_amount')
+                    - abs($transactions->where('transaction_type', 'withdraw')->sum('transaction_amount'))
+                    + $realisedProfitLoss;
                 $runningBuySell = Buysell::where(['customer_id' => $customer->id, 'is_running' => 1])
                     ->orderBy('id', 'desc')
                     ->get();
@@ -382,7 +388,10 @@ class BuySellController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'id' => 'required',
-            'transaction_amount' => 'nullable|numeric',
+            'transaction_amount' => 'required|numeric',
+            'transaction_date' => 'required|date',
+            'actual_amount' => 'nullable|numeric',
+            'note' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -726,7 +735,7 @@ class BuySellController extends Controller
 
     public function editPending($id)
     {
-        $transaction = Pending::find($id);
+        $transaction = Pending::findOrFail($id);
         return view('admin.buy_sell.pending-edit', compact('transaction'));
     }
 
@@ -734,8 +743,13 @@ class BuySellController extends Controller
     public function updatePending(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'id' => 'required',
-            'tt' => 'sometimes|numeric',
+            'id' => 'required|exists:pending,id',
+            'type' => 'required|in:buy,sell',
+            'tt' => 'required|numeric|gt:0',
+            'limit' => 'nullable|numeric',
+            'stop' => 'nullable|numeric',
+            'take_profit' => 'nullable|numeric',
+            'stop_loss' => 'nullable|numeric',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->with('error', $validator->errors()->first());

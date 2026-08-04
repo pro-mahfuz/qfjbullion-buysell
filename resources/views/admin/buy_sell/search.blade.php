@@ -165,13 +165,13 @@
                                                         <th scope="row">{{ $index + 1 }}</th>
                                                         <td><span class="font-weight-bold">{{ $transaction->reference_no ?: '—' }}</span></td>
                                                         <td>
-                                                            <div>{{ $openingTrade?->created_at?->format('d M Y') ?? '—' }}</div>
-                                                            <small class="text-muted">{{ $openingTrade?->current_rate ? number_format($openingTrade->current_rate, 3) : '—' }}</small>
+                                                            <div>{{ $openingTrade?->current_rate ? number_format($openingTrade->current_rate, 3) : '—' }}</div>
+                                                            <small class="text-muted">{{ $openingTrade?->created_at?->format('d M Y') ?? '—' }}</small>
                                                         </td>
                                                         <td><span class="badge badge-{{ $openingType === 'buy' ? 'info' : 'danger' }}">{{ strtoupper($openingType) }}</span></td>
                                                         <td>
-                                                            <div>{{ $transaction->created_at?->format('d M Y, H:i') }}</div>
-                                                            <small class="text-muted">{{ number_format($transaction->current_rate, 3) }}</small>
+                                                            <div>{{ number_format($transaction->current_rate, 3) }}</div>
+                                                            <small class="text-muted">{{ $transaction->created_at?->format('d M Y, H:i') }}</small>
                                                         </td>
                                                         <td><span class="badge badge-{{ $closingType === 'buy' ? 'info' : 'danger' }}">{{ strtoupper($closingType) }}</span></td>
                                                         <td class="text-right">{{ number_format($transaction->display_quantity, 3) }}</td>

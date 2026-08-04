@@ -642,6 +642,7 @@ class TransactionService
                 'sumSell' => $sumSell,
                 'totalProfitLoss' => $totalProfitLoss,
                 'pending' => $this->getPendingList(),
+                'show_service_charge' => false,
             ]
         )->setPaper('a4', 'landscape');
         // $pdf->save(storage_path('app/public/statement.pdf'));

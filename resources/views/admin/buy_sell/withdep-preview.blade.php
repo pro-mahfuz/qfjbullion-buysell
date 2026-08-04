@@ -141,11 +141,7 @@
                                                 <th>Note</th>
                                                 <th>Amount</th>
                                                 @can('dashboard_transection_section')
-                    
-                                                <!-- Hidden by default -->
                                                 <th style="width: 60px;">Action</th>
-                                                <th class="new-amount-cell1" style="display: none;">New Amount</th>
-                                                {{-- <th class="new-amount-cell2" style="display: none;">New Action</th> --}}
                                                 @endcan
                                             </tr>
                                         </thead>
@@ -153,16 +149,25 @@
                                             @if (count($transactionsByType) > 0)
                                                 @foreach ($transactionsByType as $transaction)
                                                     <tr data-id="{{ $transaction->id }}">
-                                                        <td>{{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d-m-Y') }}
+                                                        <td class="transaction-date">
+                                                            <span>{{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d-m-Y') }}</span>
+                                                            <input type="date" class="form-control edit-field edit-date" style="display: none;"
+                                                                value="{{ \Carbon\Carbon::parse($transaction->transaction_date)->format('Y-m-d') }}" />
                                                         </td>
-                                                        <td class="transaction-note">
+                                                        <td class="transaction-previous">
                                                             <span>{{ $transaction->actual_amount }}</span>
+                                                            <input type="number" step="0.001" class="form-control edit-field edit-previous" style="display: none;"
+                                                                value="{{ $transaction->actual_amount }}" />
                                                         </td>
                                                         <td class="transaction-note">
                                                             <span>{{ $transaction->note }}</span>
+                                                            <input type="text" class="form-control edit-field edit-note" style="display: none;"
+                                                                value="{{ $transaction->note }}" />
                                                         </td>
                                                         <td class="transaction-amount">
                                                             <span>{{ $transaction->transaction_amount }}</span>
+                                                            <input type="number" step="0.001" class="form-control edit-field edit-amount" style="display: none;"
+                                                                value="{{ $transaction->transaction_amount }}" />
                                                         </td>
                                                         @can('dashboard_transection_section')
                     
@@ -171,42 +176,23 @@
                                                                 data-id="{{ $transaction->id }}">
                                                                 <i class="fas fa-edit"></i>
                                                             </button>
-                                                        </td>
-                                                        <td class="new-amount-cell" style="display: none; width: auto;">
-                                                            <div class="d-flex ">
-                                                                <input type="text" class="form-control new-amount col-md-6"
-                                                                    value="{{ $transaction->transaction_amount }}"
-                                                                    data-id="{{ $transaction->id }}" />
-                                                                <div class="action-cell ml-2">
-                                                                    <button class="btn btn-sm btn-success submit-transaction"
+                                                            <div class="edit-actions" style="display: none; white-space: nowrap;">
+                                                                <button class="btn btn-sm btn-success submit-transaction"
                                                                         data-id="{{ $transaction->id }}">
-                                                                        Submit
-                                                                    </button>
-                                                                    <button class="btn btn-sm btn-danger cancel-edit mt-1"
+                                                                    Save
+                                                                </button>
+                                                                <button class="btn btn-sm btn-secondary cancel-edit"
                                                                         data-id="{{ $transaction->id }}">
-                                                                        Cancel
-                                                                    </button>
-                                                                    <button class="btn btn-sm btn-danger cancel-delete mt-1"
+                                                                    Cancel
+                                                                </button>
+                                                                <button class="btn btn-sm btn-danger cancel-delete"
                                                                         data-id="{{ $transaction->id }}">
-                                                                        Delete
-                                                                    </button>
-        
-        
-                                                                </div>
+                                                                    Delete
+                                                                </button>
                                                             </div>
                                                         </td>
         
                                                        @endcan
-                                                        {{-- <td class="action-cell" style="display: none;">
-                                                            <button class="btn btn-sm btn-success submit-transaction"
-                                                                data-id="{{ $transaction->id }}">
-                                                                Submit
-                                                            </button>
-                                                            <button class="btn btn-sm btn-danger cancel-edit"
-                                                                data-id="{{ $transaction->id }}">
-                                                                Cancel
-                                                            </button>
-                                                        </td> --}}
                                                     </tr>
                                                 @endforeach
                                             @else
@@ -249,21 +235,13 @@
             
             let $button = $(this);
             let $row = $button.closest('tr');
-            let $newAmountCell = $row.find('.new-amount-cell');
-            let $newAmountCell1 = $row.find('.new-amount-cell1');
-            // let $newAmountCell2 = $row.find('.new-amount-cell2');
-            let $actionCell = $row.find('.action-cell');
             let $editButton = $row.find('.edit-transaction');
 
-            // Show the new amount input field, submit button, and cancel button
-            $newAmountCell.show();
-            $newAmountCell1.show();
-            $actionCell.show();
-
-            // Show the new amount column header
-            $table.find("th.new-amount-cell1").show();
-            // $table.find("th.new-amount-cell2").show();
-            // Hide the Edit button
+            $row.find('.edit-field').each(function() {
+                $(this).data('original-value', $(this).val());
+            });
+            $row.find('td > span').hide();
+            $row.find('.edit-field, .edit-actions').show();
             $editButton.hide();
         });
 
@@ -272,7 +250,10 @@
             let $button = $(this);
             let $row = $button.closest('tr');
             let transactionId = $button.data("id");
-            let updatedAmount = $row.find('.new-amount').val().trim();
+            let updatedAmount = $row.find('.edit-amount').val().trim();
+            let updatedDate = $row.find('.edit-date').val();
+            let updatedPrevious = $row.find('.edit-previous').val().trim();
+            let updatedNote = $row.find('.edit-note').val().trim();
             let transactionType = "{{ $type }}"; // Pass the type variable
             // Validate input
             if (!updatedAmount || isNaN(updatedAmount)) {
@@ -280,6 +261,14 @@
                     icon: 'error',
                     title: 'Invalid Amount',
                     text: 'Please enter a valid numeric amount.'
+                });
+                return;
+            }
+            if (!updatedDate) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Date',
+                    text: 'Please select a transaction date.'
                 });
                 return;
             }
@@ -295,24 +284,13 @@
                     _token: "{{ csrf_token() }}",
                     id: transactionId,
                     transaction_amount: updatedAmount,
+                    transaction_date: updatedDate,
+                    actual_amount: updatedPrevious,
+                    note: updatedNote,
                     type: transactionType
                 },
                 success: function(response) {
                     if (response.success) {
-                        // Update the table with the new value in the original column
-                        $row.find('.transaction-amount span').text(updatedAmount);
-
-                        // Hide the new amount input field and action buttons
-                        $row.find('.new-amount-cell').hide();
-                        $row.find('.action-cell').hide();
-
-                        // Hide the new amount column header
-                        $table.find("th.new-amount-cell1").hide();
-                        // $table.find("th.new-amount-cell2").hide();
-
-                        // Show the Edit button again
-                        $row.find('.edit-transaction').show();
-
                         // Show success Swal
                         Swal.fire({
                             icon: 'success',
@@ -361,16 +339,11 @@
             let $button = $(this);
             let $row = $button.closest('tr');
 
-            // Hide the new amount input field and action buttons
-            $row.find('.new-amount-cell').hide();
-            $row.find('.action-cell').hide();
-            $row.find('.new-amount-cell1').hide();
-
-            // Hide the new amount column header
-            $table.find("th.new-amount-cell1").hide();
-            // $table.find("th.new-amount-cell2").hide();
-
-            // Show the Edit button again
+            $row.find('.edit-field').each(function() {
+                $(this).val($(this).data('original-value'));
+            });
+            $row.find('.edit-field, .edit-actions').hide();
+            $row.find('td > span').show();
             $row.find('.edit-transaction').show();
         });
 

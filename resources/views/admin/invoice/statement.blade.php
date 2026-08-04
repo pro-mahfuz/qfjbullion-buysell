@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <style>
         @page { margin: 20px 22px 30px; }
@@ -9,20 +8,17 @@
             color: #1f2937;
             font-size: 9px;
         }
-
         h1,
         h2,
         h5 {
             color: #343a40;
         }
-
         .card {
             border: 1px solid #3b3c3c;
             border-radius: 8px;
             padding: 2px;
             background-color: #ffffff;
         }
-
         /* .header {
             background-color: #252525;
             color: white;
@@ -283,8 +279,8 @@
                                     
                                     <td>{{ $data['sum_of_deposit'], 2 }}</td>
                                     <td>{{ $data['sum_of_withdraw'], 2 }}</td>
-                                    <td>{{ number_format((float) str_replace(',', '', $data['current_profit_loss']), 3) }}</td>
-                                    <td>{{ number_format($data['current_balance'], 3) }}</td>
+                                    <td>{{ number_format($corrected_realised_profit_loss ?? (float) str_replace(',', '', $data['current_profit_loss']), 3) }}</td>
+                                    <td>{{ number_format($corrected_balance ?? $data['current_balance'], 3) }}</td>
                                     <!--<td>{{ abs($value * 3.746) }}</td>-->
                                     <td>{{ abs($data['sum_of_running_buy_ttb'] - $data['sum_of_running_sell_ttb']) }} {{$data['sum_of_running_buy_ttb'] - $data['sum_of_running_sell_ttb'] < 0 ? 'Sell' : 'Buy'}}</td>
                                     <td> {{ $value != 0 ? number_format((($market_price) * abs($value)), 3):0 }}</td>
@@ -294,7 +290,7 @@
                                     $current_balance = $data['current_balance'];
                                     $sum_of_running_running_profit_loss = $data['sum_of_running_running_profit_loss'];
                                     $sum_of_running_service_charge = 1*($data['sum_of_running_buy_ttb'] + $data['sum_of_running_sell_ttb']) * 13.7639;
-                                    $last_equity = $current_balance + $runningTTB_profit ;
+                                    $last_equity = $corrected_equity ?? ($current_balance + $runningTTB_profit);
                                     
                                     @endphp
                                     <!--<td>{{ is_numeric($equity) ? number_format($equity / 3.6715, 3) : '0' }}</td>-->
@@ -302,7 +298,7 @@
                                     
                                     @php 
                                         $active_ttb = abs($data['sum_of_running_buy_ttb'] - $data['sum_of_running_sell_ttb']);
-                                        $equity = $data['equity'] - ($data['sum_of_running_service_charge'] * 13.7639);
+                                        $equity = $last_equity;
                                         
                                         $margin_gap = $active_ttb != 0 
                                             ? $equity / $active_ttb 
@@ -335,7 +331,9 @@
                                 <th scope="col">Type</th>
                                 <th scope="col">Quantity</th>
                                 <th scope="col">Open Rate</th>
-                                <th scope="col">Service Charge (AED)</th>
+                                @if ($show_service_charge ?? true)
+                                    <th scope="col">Service Charge (AED)</th>
+                                @endif
                                 <th scope="col">Swap Charge (AED)</th>
                                 <th scope="col">Total Value (AED)</th>
                                 <th scope="col">Current Value (AED)</th>
@@ -360,7 +358,9 @@
                                         <td>{{ $transaction->type }}</td>
                                         <td>{{ $transaction->tt_quantity - $transaction->close_quanntity }}</td>
                                         <td id="current_rate-{{ $sl }}">{{ number_format($transaction->current_rate, 3) }}</td>
-                                        <td style="text-align: center;">{{ number_format(($transaction->tt_quantity - $transaction->close_quanntity) * ($transaction->service_charge * 13.7639), 3) }}</td>
+                                        @if ($show_service_charge ?? true)
+                                            <td style="text-align: center;">{{ number_format(($transaction->tt_quantity - $transaction->close_quanntity) * ($transaction->service_charge * 13.7639), 3) }}</td>
+                                        @endif
 
                                         <td style="text-align: center;">{{ number_format($transaction->swap_charge ?? 0, 3) }}</td>
 
@@ -408,7 +408,7 @@
                                 @endforeach
                                 
                                 <tr>
-                                        <td colspan='10' class="text-right">Total P/L: </td>
+                                        <td colspan="{{ ($show_service_charge ?? true) ? 10 : 9 }}" class="text-right">Total P/L: </td>
                                         <td style="text-align: center;">
                                            {{number_format($runningTTB_profit_loss,3)}}
                                         </td>
@@ -428,14 +428,16 @@
                                 <tr>
                                     <th>SL</th>
                                     <th>Item Code</th>
-                                    <th>Date</th>
+                                    <th>Open Date</th>
                                     <th>Gold Qty</th>
                                     <th>B/S</th>
                                     <th>Rate</th>
-                                    <th>Date</th>
+                                    <th>Closed Date</th>
                                     <th>B/S</th>
                                     <th>Rate</th>
-                                    <th>Service Charge (AED)</th>
+                                    @if ($show_closed_service_charge ?? ($show_service_charge ?? true))
+                                        <th>Service Charge (AED)</th>
+                                    @endif
                                     <th>Swap Charge (AED)</th>
                                     <th>Total Value (AED)</th>
                                     <th>Current Value (AED)</th>
@@ -470,14 +472,16 @@
                                         <tr>
                                             <td>{{ $i++ }}</td>
                                             <td>TTB</td>
-                                            <td>{{ date('d-M-Y', strtotime($detail->created_at)) }}</td>
+                                            <td>{{ $openingTrade?->created_at ? date('d-M-Y', strtotime($openingTrade->created_at)) : '—' }}</td>
                                             <td>{{ number_format($detail->display_quantity ?? $detail->quantity, 3) }}</td>
                                             <td>{{ $detail->transaction_type == 'sell' ? 'Sell' : 'Buy' }}</td>
                                             <td>{{ number_format($detail->starting_rate, 3) }}</td>
-                                            <td>{{ date('d-M-Y', strtotime($detail->transaction_date)) }}</td>
+                                            <td>{{ date('d-M-Y', strtotime($detail->transaction_date ?? $detail->created_at)) }}</td>
                                             <td>{{ $detail->transaction_type == 'buy' ? 'Sell' : 'Buy' }}</td>
                                             <td>{{ number_format($detail->current_rate, 3) }}</td>
-                                            <td>{{ number_format($serviceCharge, 3) }}</td>
+                                            @if ($show_closed_service_charge ?? ($show_service_charge ?? true))
+                                                <td>{{ number_format($serviceCharge, 3) }}</td>
+                                            @endif
                                             <td>{{ number_format($swapCharge, 3) }}</td>
                                             <td>{{ number_format($totalValue, 3) }}</td>
                                             <td>{{ number_format($currentValue, 3) }}</td>
@@ -486,13 +490,13 @@
                                         </tr>
                                     @endforeach
                                     <tr class="table-active">
-                                        <td colspan="13"><strong>Total Profit/Loss</strong></td>
+                                        <td colspan="{{ ($show_closed_service_charge ?? ($show_service_charge ?? true)) ? 13 : 12 }}"><strong>Total Profit/Loss</strong></td>
                                         <td style="text-align: right;padding-right: 25px;"><strong>AED
                                                 {{ number_format($total_profit_or_loss, 3) }}</strong></td>
                                     </tr>
                                 @else
                                     <tr>
-                                        <td colspan="14" class="text-center">No transactions found.</td>
+                                        <td colspan="{{ ($show_closed_service_charge ?? ($show_service_charge ?? true)) ? 14 : 13 }}" class="text-center">No transactions found.</td>
                                     </tr>
                                 @endif
                             </tbody>
