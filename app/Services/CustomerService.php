@@ -262,21 +262,18 @@ class CustomerService
     }
 
 
-    public function deleteCustomer(int $id): void
+    public function deleteCustomer(int $id): bool
     {
         try {
-            \DB::beginTransaction();
-            Transaction::where('customer_id', $id)->delete();
+            $hasBuySellRecords = Buysell::where('customer_id', $id)->exists();
+            $hasTransactionRecords = Transaction::where('customer_id', $id)->exists();
 
-            Buysell::where('customer_id', $id)->delete();
+            if ($hasBuySellRecords || $hasTransactionRecords) {
+                return false;
+            }
 
-            Customer::where([
-                ['id', '=', $id]
-            ])->delete();
-
-            \DB::commit();
+            return Customer::where('id', $id)->delete() > 0;
         } catch (\Exception $e) {
-            \DB::rollBack();
             throw new RedirectException('Something went wrong');
         }
     }

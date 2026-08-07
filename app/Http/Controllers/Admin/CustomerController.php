@@ -92,7 +92,7 @@ class CustomerController extends Controller
 
         $this->customerService->updateCustomer($postData, $postData['id']);
 
-        return redirect()->back()->with('success', 'Updated Successfully');
+        return redirect()->route('admin.customer.list')->with('success', 'Updated Successfully');
     }
 
 
@@ -141,7 +141,15 @@ class CustomerController extends Controller
 
     public function deleteCustomer(Request $request)
     {
-        $this->customerService->deleteCustomer($request->id);
+        $deleted = $this->customerService->deleteCustomer($request->id);
+
+        if (!$deleted) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This customer cannot be deleted because it has buy/sell, deposit, or withdrawal records.',
+            ], 422);
+        }
+
         return response()->json(['success' => 'Deleted Successfully']);
     }
 

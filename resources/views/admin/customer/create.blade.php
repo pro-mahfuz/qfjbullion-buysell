@@ -33,7 +33,7 @@
                     <div class="form-section__title">Account information</div>
                     <div class="form-section__body"><div class="row">
                         <div class="col-md-4"><div class="form-group"><label for="customer_code">Customer code <span class="text-danger">*</span></label><input type="text" name="customer_code" id="customer_code" class="form-control" value="{{ old('customer_code') }}" placeholder="Enter customer-defined code" required>@error('customer_code')<small class="text-danger">{{ $message }}</small>@enderror</div></div>
-                        <div class="col-md-4"><div class="form-group"><label for="name">Full name <span class="text-danger">*</span></label><input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}" required>@error('name')<small class="text-danger">{{ $message }}</small>@enderror</div></div>
+                        <div class="col-md-4"><div class="form-group"><label for="name">Customer name <span class="text-danger">*</span></label><input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}" required>@error('name')<small class="text-danger">{{ $message }}</small>@enderror</div></div>
                         <div class="col-md-4"><div class="form-group"><label for="type">Account type <span class="text-danger">*</span></label><select name="type" id="type" class="form-control" required><option value="customer" @selected(old('type', 'customer') === 'customer')>Customer</option><option value="client" @selected(old('type') === 'client')>IB</option></select>@error('type')<small class="text-danger">{{ $message }}</small>@enderror</div></div>
                     </div></div>
                 </div>

@@ -223,7 +223,7 @@
                     <div class="metric-grid">
                         <div class="metric"><span class="metric__label">Deposits</span><span class="metric__value">AED {{ $data['sum_of_deposit'] }}</span></div>
                         <div class="metric"><span class="metric__label">Withdrawals</span><span class="metric__value">AED {{ $data['sum_of_withdraw'] }}</span></div>
-                        <div class="metric"><span class="metric__label">Realised P/L</span><span class="metric__value">AED {{ number_format($realisedProfitLoss, 3) }}</span></div>
+                        <div class="metric"><span class="metric__label">Booking Profit / Loss</span><span class="metric__value">AED {{ number_format($realisedProfitLoss, 3) }}</span></div>
                         <div class="metric"><span class="metric__label">Cash balance</span><span class="metric__value">AED {{ number_format($cashBalanceAfterProfitLoss, 3) }}</span></div>
                         <div class="metric"><span class="metric__label">Net gold position</span><span class="metric__value">{{ $activeTtb }} TTB {{ $netTtb < 0 ? 'Sell' : ($netTtb > 0 ? 'Buy' : '') }}</span></div>
                         <div class="metric"><span class="metric__label">Position value</span><span class="metric__value">AED {{ $value != 0 ? number_format($market_price * abs($value) * 13.7639, 3) : '0.00' }}</span></div>
@@ -237,7 +237,7 @@
                         <span>Sell quantity: <strong>{{ $sumSell }}</strong></span>
                         <span>Net position: <strong>{{ abs($value) }} {{ $value < 0 ? 'Sell' : ($value > 0 ? 'Buy' : '') }}</strong></span>
                         <span>Unrealised P/L: <strong>AED {{ number_format($runningTTB_profit, 3) }}</strong></span>
-                        <span>Margin Limit: <strong>{{ $value == 0 ? '0' : $customer->cutposition . ' (' . ($value < 0 ? 'Sell' : 'Buy') . ')' }}</strong></span>
+                        <span>Margin Limit: <strong>{{ $marginLimit == 0 ? '0' : number_format($marginLimit, 3) . ' (' . $marginPosition . ')' }}</strong></span>
                     </div>
                     <div class="table-responsive">
                     <table class="table table-striped table-bordered statement-table">

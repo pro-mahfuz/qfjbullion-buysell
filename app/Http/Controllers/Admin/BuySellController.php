@@ -14,6 +14,7 @@ use App\Models\Buysell;
 use App\Models\Transaction;
 use App\Services\GoldService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 use RateLimiter;
@@ -48,6 +49,7 @@ class BuySellController extends Controller
         $sell = null;
         $current_amount = null;
         $pending = null;
+        $marginLimit = 0;
         if ($request->customer != null) {
             $customer = $this->customerService->customerSerach($request->customer);
             if ($customer) {
@@ -62,6 +64,31 @@ class BuySellController extends Controller
                     ->get();
                 $runningBuy = $runningBuySell->where('type', 'buy')->sum('tt_quantity');
                 $runningSell = $runningBuySell->where('type', 'sell')->sum('tt_quantity');
+
+                $marketPrice = 0;
+                $response = Http::get('https://qfjbullion.com/rate');
+                if ($response->successful()) {
+                    $rateData = $response->json();
+                    $marketPrice = isset($rateData['value']) ? ((float) $rateData['value'] - 0.53) : 0;
+                }
+
+                $activeBuyTtb = $runningBuySell->where('type', 'buy')->sum(
+                    fn ($trade) => max((float) $trade->tt_quantity - (float) ($trade->close_quanntity ?? 0), 0)
+                );
+                $activeSellTtb = $runningBuySell->where('type', 'sell')->sum(
+                    fn ($trade) => max((float) $trade->tt_quantity - (float) ($trade->close_quanntity ?? 0), 0)
+                );
+                $activeTtb = $activeBuyTtb - $activeSellTtb;
+                $unrealisedProfitLoss = $this->transactionService->calculateUnrealisedProfitLoss($runningBuySell, $marketPrice);
+                $equity = $current_amount + $unrealisedProfitLoss;
+
+                if ($activeTtb != 0) {
+                    $marginGap = ($equity / abs($activeTtb)) / 13.7639;
+                    $marginLimit = abs($activeTtb > 0
+                        ? $marketPrice - $marginGap
+                        : $marketPrice + $marginGap);
+                }
+
                 $pending = $this->transactionService->getPendings($customer->id);
                 $lastTen = $this->transactionService->getLastTenCompletedList($customer->id);
             }
@@ -83,7 +110,8 @@ class BuySellController extends Controller
             'pending' => $pending,
             'lastTen' => $lastTen,
             'runningBuy' => $runningBuy,
-            'runningSell' => $runningSell
+            'runningSell' => $runningSell,
+            'marginLimit' => $marginLimit,
         ];
 
         return view('admin.buy_sell.search', data: $data);

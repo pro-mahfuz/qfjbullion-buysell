@@ -50,7 +50,7 @@
                      </td>
                     <td style="text-align:center; font-size:23px"> {{ $withdraw }} </td>
                     <td style="text-align:center; font-size:23px"> <span id="equity">0.00</span> </td>
-                    <td style="text-align:center; font-size:23px"> <span id="cutposition">{{isset($runningBuySell) ? number_format($customer->cutposition, 3):0 }}</span> </td>
+                    <td style="text-align:center; font-size:23px"> <span id="cutposition">{{ number_format($marginLimit ?? 0, 3) }}</span> </td>
                 </tr>
 
             </tbody>

@@ -12,8 +12,12 @@ trait GolbalHelperTrait
     {
         $runningBuySell = collect($running);
 
-        $sumBuy = $running->where('type', 'buy')->sum('tt_quantity');
-        $sumSell = $running->where('type', 'sell')->sum('tt_quantity');
+        $sumBuy = $running->where('type', 'buy')->sum(
+            fn ($trade) => max((float) $trade->tt_quantity - (float) ($trade->close_quanntity ?? 0), 0)
+        );
+        $sumSell = $running->where('type', 'sell')->sum(
+            fn ($trade) => max((float) $trade->tt_quantity - (float) ($trade->close_quanntity ?? 0), 0)
+        );
 
         $totalQty = abs($sumBuy - $sumSell);
 

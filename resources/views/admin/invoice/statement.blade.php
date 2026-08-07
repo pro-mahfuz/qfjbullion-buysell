@@ -219,7 +219,7 @@
                             <td><span class="label">Market price</span><span class="value">$ {{ number_format($market_price, 3) }}</span></td>
                             <td><span class="label">Net position</span><span class="value">{{ abs($value) }} TTB {{ $positionLabel }}</span></td>
                             <td><span class="label">Open P/L</span><span class="value">AED {{ number_format($runningTTB_profit, 3) }}</span></td>
-                            <td><span class="label">Margin Limit</span><span class="value">{{ $value == 0 ? '0' : $customer->cutposition . ' (' . $positionLabel . ')' }}</span></td>
+                            <td><span class="label">Margin Limit</span><span class="value">{{ $marginLimit == 0 ? '0' : number_format($marginLimit, 3) . ' (' . $marginPosition . ')' }}</span></td>
                         </tr>
                     </table>
             </div>

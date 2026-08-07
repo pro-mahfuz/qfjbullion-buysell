@@ -140,7 +140,28 @@ class TransactionController extends Controller
         $runningBuySell = Buysell::where(['customer_id' => $request->id, 'is_running' => 1])
                     ->orderBy('id', 'desc')
                     ->get();
-    
+
+        $marginTransactions = Transaction::where('customer_id', $request->id)->get();
+        $marginCashBalance = (float) $marginTransactions->where('transaction_type', 'deposit')->sum('transaction_amount')
+            - abs((float) $marginTransactions->where('transaction_type', 'withdraw')->sum('transaction_amount'))
+            + $this->transactionService->calculateRealisedProfitLoss($marginTransactions);
+        $marginUnrealisedProfitLoss = $this->transactionService->calculateUnrealisedProfitLoss($runningBuySell, (float) $sellPrice);
+        $marginEquity = $marginCashBalance + $marginUnrealisedProfitLoss;
+        $marginBuyTtb = $runningBuySell->where('type', 'buy')->sum(
+            fn ($trade) => max((float) $trade->tt_quantity - (float) ($trade->close_quanntity ?? 0), 0)
+        );
+        $marginSellTtb = $runningBuySell->where('type', 'sell')->sum(
+            fn ($trade) => max((float) $trade->tt_quantity - (float) ($trade->close_quanntity ?? 0), 0)
+        );
+        $marginActiveTtb = $marginBuyTtb - $marginSellTtb;
+        $marginLimit = 0;
+
+        if ($marginActiveTtb != 0) {
+            $marginGap = ($marginEquity / abs($marginActiveTtb)) / 13.7639;
+            $marginLimit = abs($marginActiveTtb > 0
+                ? $sellPrice - $marginGap
+                : $sellPrice + $marginGap);
+        }
 
         // Get statement
         $statement = $this->transactionService->getStatement($request->id, $sellPrice, $startDate, $endDate);
@@ -238,6 +259,8 @@ class TransactionController extends Controller
                 'corrected_realised_profit_loss' => $realisedProfitLoss,
                 'corrected_balance' => $correctedBalance,
                 'corrected_equity' => $correctedEquity,
+                'marginLimit' => $marginLimit,
+                'marginPosition' => $marginActiveTtb < 0 ? 'Sell' : ($marginActiveTtb > 0 ? 'Buy' : ''),
                 'show_service_charge' => false,
                 'show_closed_service_charge' => false,
             ]
@@ -355,6 +378,28 @@ class TransactionController extends Controller
         $runningBuySell = Buysell::where(['customer_id' => $request->id, 'is_running' => 1])
                     ->orderBy('id', 'desc')
                     ->get();
+
+        $marginTransactions = Transaction::where('customer_id', $request->id)->get();
+        $marginCashBalance = (float) $marginTransactions->where('transaction_type', 'deposit')->sum('transaction_amount')
+            - abs((float) $marginTransactions->where('transaction_type', 'withdraw')->sum('transaction_amount'))
+            + $this->transactionService->calculateRealisedProfitLoss($marginTransactions);
+        $marginUnrealisedProfitLoss = $this->transactionService->calculateUnrealisedProfitLoss($runningBuySell, (float) $sellPrice);
+        $marginEquity = $marginCashBalance + $marginUnrealisedProfitLoss;
+        $marginBuyTtb = $runningBuySell->where('type', 'buy')->sum(
+            fn ($trade) => max((float) $trade->tt_quantity - (float) ($trade->close_quanntity ?? 0), 0)
+        );
+        $marginSellTtb = $runningBuySell->where('type', 'sell')->sum(
+            fn ($trade) => max((float) $trade->tt_quantity - (float) ($trade->close_quanntity ?? 0), 0)
+        );
+        $marginActiveTtb = $marginBuyTtb - $marginSellTtb;
+        $marginLimit = 0;
+
+        if ($marginActiveTtb != 0) {
+            $marginGap = ($marginEquity / abs($marginActiveTtb)) / 13.7639;
+            $marginLimit = abs($marginActiveTtb > 0
+                ? $sellPrice - $marginGap
+                : $sellPrice + $marginGap);
+        }
         
         //dd($data);
 
@@ -413,6 +458,8 @@ class TransactionController extends Controller
             'pending' => $pending,
             'data' => $data,
             'runningBuySell' => $runningBuySell,
+            'marginLimit' => $marginLimit,
+            'marginPosition' => $marginActiveTtb < 0 ? 'Sell' : ($marginActiveTtb > 0 ? 'Buy' : ''),
         ]);
     }
 

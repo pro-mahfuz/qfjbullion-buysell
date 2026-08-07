@@ -127,6 +127,7 @@
                     'maxtt_per_K' => $customer->maxtt_per_K,
                     'deposit' => $deposit,
                     'withdraw' => $withdraw,
+                    'marginLimit' => $marginLimit,
                 ])
             @else
                 <!--<div class="alert alert-danger">No customer found</div>-->
